@@ -1,5 +1,81 @@
 # Журнал роботи
 
+## 2026-07-15 — Пояснення Google integration і документація для захисту
+
+### Мета
+
+Зробити Calendar/Sheets блок зі скриншота ширшим і зрозумілішим, наочно
+відокремити опціональне від обов’язкового, перевірити всі Save/Sync кнопки та
+підготувати фактичну україномовну документацію для захисту проєкту.
+
+### Виконана робота
+
+- Додано full-width integration cards із зеленими optional і помаранчевими
+  conditional-required badges, покроковими setup panels та поясненням кожної
+  кнопки.
+- Calendar відхиляє embed/share URL до побудови Google client і показує точну
+  підказку, де взяти Calendar ID.
+- Sheets зберігає лише safe browser settings; disabled mode не парсить JSON і не
+  будує client, enabled Save перевіряє ID та required service-account fields.
+- Додано readiness states, окремі explicit frontend handlers і блокування Sync
+  до успішного Save/готової конфігурації.
+- Розширено mocked tests: startup/disabled laziness, incomplete credentials,
+  incomplete session, header reuse, duplicate prevention, secret safety,
+  Calendar independence та frontend button contracts.
+- Створено `docs/PROJECT_DEFENSE_GUIDE.md` і розширено практичний README.
+
+### Перевірка
+
+- focused integration/frontend pytest — PASSED (`32 passed`)
+- full pytest — PASSED (`79 passed`)
+- compileall, Ruff, Black — PASSED
+- `node --check` — PASSED для 7 JavaScript files
+- route listing, Google imports, `pip check` — PASSED
+- read-only SQLite inspection — `34` sessions
+- Playwright temporary DB: general Save, Sheets disabled Save, enabled missing
+  credentials, Calendar/Sheets mocked sync click paths, embed URL rejection —
+  PASSED
+- desktop dark + mobile layout — no horizontal overflow
+- final browser console — `0 errors`, `0 warnings`
+
+### Не змінено
+
+- timer/Skip transitions, models, migrations, SQLite database користувача,
+  dependencies, Calendar/Sheets independence та інші сторінки
+- реальні secrets не читалися, не змінювалися й не виводилися
+- реальні Google writes і Docker image build не заявляються як перевірені
+
+## 2026-07-15 — Skip для focus і break
+
+### Мета
+
+Додати поруч із `Reset` одну кнопку `Skip`, яка працює для focus і обох break
+режимів та одразу запускає наступний countdown.
+
+### Виконана робота
+
+- Додано доступну кнопку `Skip` у timer controls без нових CSS-правил.
+- Реалізовано окремий skip transition без виклику sessions API.
+- Пропущений `work` не збільшує completed cycle count; `short_break` переходить
+  у `work`, а `long_break` починає новий цикл.
+- Наступний режим запускається негайно незалежно від auto-start setting.
+- Додано frontend regression tests і стабілізовано test fixture явним
+  `POMODORO_TEST_MODE=true`.
+
+### Перевірка
+
+- focused timer/frontend suite — PASSED (`12 passed`)
+- full pytest — PASSED (`65 passed`)
+- Playwright: skipped work і short break — `0` database rows
+- Playwright: normal work + short break — обидва режими збережені
+- statistics smoke: focus `0.17`, break `0.08`, total `0.25` minutes
+- browser console — `0 errors`, `0 warnings`
+
+### Не змінено
+
+- backend session/statistics rules, database schema та API routes
+- Google Calendar, Google Sheets, CSV, calendar views і Docker
+
 ## 2026-07-15 — Google Sheets integration and 3D clock states
 
 ### Мета

@@ -60,6 +60,40 @@
 
 ## 2026-07-15
 
+### Added — integration guidance and project defense
+
+- Full-width Calendar and Sheets cards with green optional badges, orange
+  conditional-required badges, button-specific explanations, setup steps, and
+  explicit instructions for finding the external result.
+- Safe readiness fields for Sheets and structured success metadata.
+- Calendar ID prevalidation that rejects embed/share URLs before a Google
+  client or network request is used.
+- `tests/test_google_sheets_service.py` and
+  `tests/test_integrations_frontend.py`, plus focused API regression scenarios.
+- `docs/PROJECT_DEFENSE_GUIDE.md`, including code/data-flow explanations,
+  environment/route/model tables, manual verification, a defense speech, demo
+  checklist, and teacher questions.
+
+### Changed — integration guidance and project defense
+
+- Sheets enabled settings now validate the Spreadsheet ID and required
+  service-account fields; disabled blank settings remain valid and lazy.
+- Frontend handlers use explicit `syncGoogleCalendar()`,
+  `saveGoogleSheetsSettings()`, and `syncGoogleSheets()` names.
+- Sync buttons remain visible but disabled until their exact readiness
+  conditions are satisfied.
+
+### Verified — integration guidance and project defense
+
+- focused integration/frontend suite — `32 passed`
+- full pytest suite — `79 passed`
+- compileall, Ruff, Black, and syntax checks for all 7 JavaScript files
+- Flask route listing, `pip check`, Google client imports, and read-only SQLite
+  inspection (`34` stored sessions)
+- temporary-SQLite Playwright checks for all four visible Save/Sync buttons,
+  embed-URL rejection, mocked success handlers, responsive layout, and final
+  browser console with `0` errors and `0` warnings
+
 ### Changed
 
 - Compact frontend spacing and reordered the homepage into carousel, timer,
@@ -191,3 +225,26 @@
 - `pytest tests/test_pages.py -v`
 - live HTTP smoke for `/`, `/api/statistics/month?timezone=Europe/Kyiv`, `/api/statistics/week?timezone=Europe/Kyiv`, `/api/statistics/chart?timezone=Europe/Kyiv`, and `/api/statistics/month?timezone=UTC`
 - Playwright + Edge headless smoke for carousel controls, indicators, deeplinks, mobile layout, and console cleanliness
+
+## 2026-07-15 — Timer Skip control
+
+### Added
+
+- `Skip` button beside `Reset` for work, short-break, and long-break modes.
+- Focused frontend regression coverage for button placement, immediate mode
+  transition, no save call, and completed-cycle preservation.
+
+### Changed
+
+- Skipping now discards the active interval and immediately starts the next
+  countdown regardless of the auto-start setting.
+- The testing fixture explicitly enables `POMODORO_TEST_MODE`, preventing local
+  `.env` values from changing testing-config expectations.
+
+### Verified
+
+- focused timer/frontend suite — `12 passed`
+- full pytest suite — `65 passed`
+- Playwright verified work and break skipping with no inserted sessions
+- normal work and short-break completion stored and counted both durations
+- final browser console — `0 errors`, `0 warnings`

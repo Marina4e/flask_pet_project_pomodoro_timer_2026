@@ -1,8 +1,19 @@
 from __future__ import annotations
 
+import json
+
+from app.services.google_calendar_service import GoogleCalendarService
 from app.services.google_sheets_service import GoogleSheetsService
 
 SPREADSHEET_ID = "1AbCdEfGhIjKlMnOpQrStUvWxYz1234567890"
+VALID_CREDENTIALS = json.dumps(
+    {
+        "type": "service_account",
+        "client_email": "pomodoro@example.iam.gserviceaccount.com",
+        "private_key": "test-private-key",
+        "token_uri": "https://oauth2.googleapis.com/token",
+    }
+)
 
 
 class _FakeRequest:
@@ -69,7 +80,7 @@ class _FakeSheetsService:
         return _FakeSpreadsheetsResource(self.values_resource)
 
 
-def _configure_sheets(app, *, credentials='{"type":"service_account"}'):
+def _configure_sheets(app, *, credentials=VALID_CREDENTIALS):
     app.config["GOOGLE_SHEETS_ENABLED"] = True
     app.config["GOOGLE_SHEETS_SPREADSHEET_ID"] = SPREADSHEET_ID
     app.config["GOOGLE_SHEETS_CREDENTIALS_JSON"] = credentials
@@ -79,7 +90,7 @@ def _mock_sheets_client(monkeypatch, fake_service):
     monkeypatch.setattr(
         GoogleSheetsService,
         "_build_sheets_service",
-        classmethod(lambda cls: fake_service),
+        classmethod(lambda cls, credentials_info: fake_service),
     )
 
 
@@ -126,6 +137,22 @@ def test_google_sheets_sync_rejects_invalid_credentials_json(app, client):
     )
 
 
+def test_google_sheets_sync_rejects_incomplete_credentials(app, client):
+    _configure_sheets(app, credentials='{"type":"service_account"}')
+
+    response = client.post("/api/integrations/google-sheets/sync", json={})
+
+    assert response.status_code == 400
+    assert response.get_json()["error"]["message"] == (
+        "Google Sheets credentials are invalid or incomplete"
+    )
+    assert set(response.get_json()["error"]["details"]["missing_fields"]) == {
+        "client_email",
+        "private_key",
+        "token_uri",
+    }
+
+
 def test_google_sheets_sync_exports_completed_work_session(
     app,
     client,
@@ -141,6 +168,8 @@ def test_google_sheets_sync_exports_completed_work_session(
 
     assert response.status_code == 200
     payload = response.get_json()
+    assert payload["success"] is True
+    assert payload["integration"] == "google_sheets"
     assert payload["exported"] == 1
     assert payload["skipped"] == 0
     assert fake_service.values_resource.updated_headers == GoogleSheetsService.HEADERS
@@ -201,6 +230,67 @@ def test_google_sheets_sync_exports_only_completed_work_mode_sessions(
     ]
 
 
+def test_google_sheets_sync_reuses_existing_header(
+    app,
+    client,
+    monkeypatch,
+):
+    _configure_sheets(app)
+    fake_service = _FakeSheetsService([GoogleSheetsService.HEADERS])
+    _mock_sheets_client(monkeypatch, fake_service)
+
+    response = client.post("/api/integrations/google-sheets/sync", json={})
+
+    assert response.status_code == 200
+    assert fake_service.values_resource.updated_headers is None
+    assert fake_service.values_resource.append_calls == 0
+
+
+def test_incomplete_session_request_is_not_exported(
+    app,
+    client,
+    session_payload_factory,
+    monkeypatch,
+):
+    payload = session_payload_factory(mode="work")
+    payload.pop("completed_at_utc")
+    rejected = client.post("/api/sessions", json=payload)
+    _configure_sheets(app)
+    fake_service = _FakeSheetsService()
+    _mock_sheets_client(monkeypatch, fake_service)
+
+    response = client.post("/api/integrations/google-sheets/sync", json={})
+
+    assert rejected.status_code == 400
+    assert response.status_code == 200
+    assert response.get_json()["total_completed_work_sessions"] == 0
+    assert fake_service.values_resource.append_calls == 0
+
+
+def test_google_sheets_sync_does_not_call_google_calendar(
+    app,
+    client,
+    persist_session,
+    monkeypatch,
+):
+    _configure_sheets(app)
+    fake_service = _FakeSheetsService()
+    _mock_sheets_client(monkeypatch, fake_service)
+    persist_session(mode="work")
+    monkeypatch.setattr(
+        GoogleCalendarService,
+        "sync_latest_work_session",
+        lambda self, timezone_name=None: (_ for _ in ()).throw(
+            AssertionError("Sheets sync must not call Calendar sync")
+        ),
+    )
+
+    response = client.post("/api/integrations/google-sheets/sync", json={})
+
+    assert response.status_code == 200
+    assert response.get_json()["exported"] == 1
+
+
 def test_google_sheets_sync_returns_controlled_external_error(
     app,
     client,
@@ -222,7 +312,8 @@ def test_google_sheets_sync_returns_controlled_external_error(
     assert "RuntimeError" in caplog.text
 
 
-def test_google_sheets_settings_save_safe_values_only(client):
+def test_google_sheets_settings_save_safe_values_only(app, client):
+    app.config["GOOGLE_SHEETS_CREDENTIALS_JSON"] = VALID_CREDENTIALS
     response = client.put(
         "/api/integrations/google-sheets/settings",
         json={"enabled": True, "spreadsheet_id": SPREADSHEET_ID},
@@ -232,13 +323,64 @@ def test_google_sheets_settings_save_safe_values_only(client):
     payload = response.get_json()
     assert payload == {
         "enabled": True,
+        "configured": True,
         "spreadsheet_id": SPREADSHEET_ID,
-        "credentials_configured": False,
+        "spreadsheet_id_valid": True,
+        "credentials_configured": True,
+        "credentials_valid": True,
     }
 
     saved = client.get("/api/integrations/google-sheets/settings")
     assert saved.status_code == 200
     assert saved.get_json() == payload
-    assert "credentials" not in saved.get_data(as_text=True).replace(
-        "credentials_configured", ""
+    response_text = saved.get_data(as_text=True)
+    assert "credentials_json" not in response_text
+    assert "private_key" not in response_text
+    assert "client_email" not in response_text
+
+
+def test_google_sheets_disabled_settings_accept_blank_values(client):
+    response = client.put(
+        "/api/integrations/google-sheets/settings",
+        json={"enabled": False, "spreadsheet_id": ""},
     )
+
+    assert response.status_code == 200
+    assert response.get_json() == {
+        "enabled": False,
+        "configured": False,
+        "spreadsheet_id": "",
+        "spreadsheet_id_valid": False,
+        "credentials_configured": False,
+        "credentials_valid": False,
+    }
+
+
+def test_google_sheets_enabled_settings_require_server_credentials(client):
+    response = client.put(
+        "/api/integrations/google-sheets/settings",
+        json={"enabled": True, "spreadsheet_id": SPREADSHEET_ID},
+    )
+
+    assert response.status_code == 400
+    assert response.get_json()["error"]["message"] == (
+        "Google Sheets credentials are missing"
+    )
+
+
+def test_google_sheets_sensitive_credentials_do_not_leak(
+    app,
+    client,
+    caplog,
+):
+    secret = "PRIVATE-KEY-MUST-NOT-LEAK"
+    _configure_sheets(
+        app,
+        credentials=json.dumps({"type": "service_account", "private_key": secret}),
+    )
+
+    response = client.post("/api/integrations/google-sheets/sync", json={})
+
+    assert response.status_code == 400
+    assert secret not in response.get_data(as_text=True)
+    assert secret not in caplog.text

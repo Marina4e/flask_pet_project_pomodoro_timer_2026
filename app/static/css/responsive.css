@@ -14,6 +14,10 @@
     grid-template-columns: 1fr;
   }
 
+  .integration-card-layout {
+    grid-template-columns: 1fr;
+  }
+
   .timer-hero {
     flex-direction: column;
     align-items: stretch;
@@ -78,6 +82,21 @@
 
   .site-nav {
     padding-top: 0.75rem;
+  }
+
+  .integrations-intro,
+  .credential-status-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .integration-legend {
+    justify-content: flex-start;
+    min-width: 0;
+  }
+
+  .button-purpose-grid {
+    grid-template-columns: 1fr;
   }
 
   .timer-display {

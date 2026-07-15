@@ -7,7 +7,7 @@
 
 ## Реально реалізовані можливості
 
-- `Start`, `Pause`, `Resume`, `Reset` для браузерного таймера
+- `Start`, `Pause`, `Resume`, `Reset`, `Skip` для браузерного таймера
 - збереження завершених `work`, `short_break`, `long_break` сесій у SQLite
 - відновлення активного таймера після перезавантаження сторінки через `localStorage`
 - статистика за день, тиждень і місяць
@@ -77,11 +77,14 @@ Google до Git. Застосунок викликає `load_dotenv()` один 
 
 Підтримувані змінні:
 
-- Flask: `FLASK_APP`, `APP_ENV`, `SECRET_KEY`, `DEBUG`, `PORT`
+- Flask: `FLASK_APP`, `APP_ENV`, `SECRET_KEY`, `DEBUG`; `PORT` використовується
+  контейнерним `start.sh`, а локальний `python run.py` відкриває стандартний `5000`
 - SQLite: `DATABASE_URL`
 - таймер: `DEFAULT_TIMEZONE`, `DEFAULT_CYCLES_BEFORE_LONG_BREAK`, `POMODORO_TEST_MODE`
 - Google Calendar: `GOOGLE_CALENDAR_ID`, `GOOGLE_CALENDAR_CREDENTIALS_JSON`,
   `GOOGLE_CALENDAR_EVENT_PREFIX`, `GOOGLE_CALENDAR_EVENT_COLOR_ID`
+- Google Sheets: `GOOGLE_SHEETS_ENABLED`, `GOOGLE_SHEETS_SPREADSHEET_ID`,
+  `GOOGLE_SHEETS_CREDENTIALS_JSON`
 
 `sqlite:///pomodoro.db` перетворюється на абсолютний шлях до
 `instance/pomodoro.db`. Google credentials передаються як JSON в один рядок;
@@ -131,8 +134,23 @@ POMODORO_TEST_MODE=true
 
 Якщо значення задане і в PowerShell, і в `.env`, перемагає PowerShell. Кнопка
 короткого preset доступна лише при активному test mode. Завершені test-mode
-сесії зберігаються у `work_sessions` так само, як звичайні; `Reset` не створює
-запис, бо API викликається тільки після завершення countdown.
+сесії зберігаються у `work_sessions` так само, як звичайні; `Reset` і `Skip` не
+створюють запис для поточного інтервалу, бо API викликається тільки після
+нормального завершення countdown.
+
+### Пропуск focus або break
+
+Кнопка `Skip` знаходиться поруч із `Reset` і працює для `work`, `short_break`
+та `long_break`. Вона відкидає поточний незавершений інтервал і негайно запускає
+наступний режим незалежно від `auto_start_next_session`.
+
+- `work` -> `short_break`; пропущений focus не збільшує число completed work cycles
+- `short_break` -> `work`
+- `long_break` -> `work` і початок нового циклу
+
+Пропущена сесія не зберігається. Нормально завершені focus і break сесії
+зберігаються окремо; статистика рахує `focus_minutes`, `break_minutes` і
+`total_tracked_minutes`.
 
 ## Налаштування таймера
 
@@ -257,9 +275,17 @@ GOOGLE_CALENDAR_EVENT_COLOR_ID=
 2. Створіть `Service account`.
 3. Завантажте JSON-ключ.
 4. Поділіться потрібним Google Calendar з `client_email` цього service account.
-5. Скопіюйте `Calendar ID`.
+5. У Google Calendar відкрийте `Settings and sharing` → `Integrate calendar` і
+   скопіюйте саме `Calendar ID`. Не вставляйте embed/share URL.
 6. Перетворіть JSON у один рядок і вставте в `GOOGLE_CALENDAR_CREDENTIALS_JSON`.
 7. Вставте ID календаря в `GOOGLE_CALENDAR_ID`.
+
+Кнопка `Sync to Google Calendar` стає активною лише після коректної серверної
+конфігурації та появи завершеної `work`-сесії. Вона створює одну event для
+останнього focus, не експортує breaks і не запускається автоматично. Результат
+потрібно шукати у shared Google Calendar у час завершеної сесії. Після success
+`google_calendar_event_id` записується в SQLite, тому повторна event для тієї
+самої сесії блокується.
 
 Для цього шляху потрібні `google-api-python-client` і `google-auth`, уже вказані
 в `requirements.txt`. Якщо `import googleapiclient` не працює, достатньо
@@ -316,12 +342,16 @@ GOOGLE_SHEETS_CREDENTIALS_JSON=
 рядок у `GOOGLE_SHEETS_CREDENTIALS_JSON`. Альтернативні назви змінних або
 шлях до JSON-файлу застосунок не читає.
 
-На PowerShell JSON можна стиснути так:
+На PowerShell JSON можна стиснути однією командою:
 
 ```powershell
-Get-Content .\service-account.json -Raw |
-  ConvertFrom-Json |
-  ConvertTo-Json -Compress
+(Get-Content .\service-account.json -Raw | ConvertFrom-Json | ConvertTo-Json -Compress)
+```
+
+Альтернатива через Python:
+
+```powershell
+python -c "import json; print(json.dumps(json.load(open('service-account.json', encoding='utf-8')), separators=(',', ':')))"
 ```
 
 Вставте результат в одинарних лапках, щоб `python-dotenv` коректно прочитав
@@ -330,6 +360,10 @@ Get-Content .\service-account.json -Raw |
 ```env
 GOOGLE_SHEETS_CREDENTIALS_JSON='{"type":"service_account","...":"..."}'
 ```
+
+Не вставляйте отриманий рядок у README, GitHub, чат, screenshot або browser
+form. У поточному проєкті credentials читаються тільки Flask-сервером. Після
+зміни `.env` обов’язково перезапустіть застосунок.
 
 ### Налаштування Google Cloud і таблиці
 
@@ -346,6 +380,29 @@ GOOGLE_SHEETS_CREDENTIALS_JSON='{"type":"service_account","...":"..."}'
 7. Запустіть `flask --app run.py db upgrade`, потім `python run.py`.
 8. На головній сторінці відкрийте `Google Sheets Settings`, збережіть ID і
    натисніть `Sync Completed Sessions`.
+
+### Що роблять дві кнопки Sheets
+
+- `Save Settings` перевіряє enabled-конфігурацію та зберігає в SQLite тільки
+  checkbox і Spreadsheet ID. Ця кнопка не звертається до Google і не додає rows.
+- `Sync Completed Sessions` стає активною лише після успішного Save і готових
+  server credentials. Вона читає завершені `work`-сесії, перевіряє header A:I та
+  додає тільки відсутні `client_session_id`.
+
+Зелений badge у UI позначає повністю опціональну частину. Помаранчевий badge
+означає «обов’язково лише тоді, коли інтеграцію ввімкнено». При disabled Sheets
+відсутні ID/credentials не є помилкою й не перевіряються.
+
+### Ручна перевірка трьох станів Sheets
+
+1. **Disabled:** залиште три default values, запустіть Flask, завершіть Pomodoro
+   і перевірте SQLite/статистику. UI показує `Optional · Off`, Sync disabled.
+2. **Enabled, але incomplete:** встановіть `GOOGLE_SHEETS_ENABLED=true` із blank
+   ID/credentials. Flask стартує, а Save/Sync повертає контрольоване пояснення;
+   інші функції продовжують працювати.
+3. **Fully configured:** share Sheet із service-account `client_email`, збережіть
+   ID, виконайте Sync і перевірте A:I. Повторний Sync має показати skipped
+   duplicates без нових rows.
 
 Офіційні інструкції Google: [увімкнення Sheets API та Python
 клієнт](https://developers.google.com/workspace/sheets/api/quickstart/python),
@@ -377,6 +434,19 @@ pricing](https://developers.google.com/workspace/sheets/api/limits).
 
 Реальний запис у зовнішню Google Sheet потребує власного service account і не
 виконувався в цій сесії.
+
+## CSV export
+
+Кнопка `Export CSV` викликає `GET /api/export/sessions.csv`. Endpoint читає
+завершені rows із SQLite, за потреби фільтрує date range, конвертує timestamps у
+вибрану timezone й повертає `pomodoro-sessions.csv`. База при цьому не змінюється.
+
+## Документація для захисту
+
+Детальний зв’язок між файлами, класами, методами, routes, кнопками, моделями,
+Google integrations і тестами описано в
+[`docs/PROJECT_DEFENSE_GUIDE.md`](docs/PROJECT_DEFENSE_GUIDE.md). Там також є
+5–7-хвилинний виступ, live-demo checklist і відповіді на типові питання викладача.
 
 ## Команди для перевірки
 
@@ -423,7 +493,9 @@ filesystem контейнера.
 4. Після завершення таймер надсилає `POST /api/sessions`.
 5. Flask зберігає завершену сесію в SQLite.
 6. `statistics.js` і `calendar.js` запитують API для оновлення статистики й календаря.
-7. `integrations.js` перевіряє Google Calendar status і запускає sync для останньої `work`-сесії.
+7. `integrations.js` окремо перевіряє Calendar і Sheets readiness: Calendar
+   sync-ить latest `work`, Sheets Save зберігає safe settings, а Sheets Sync
+   експортує нові completed `work` rows.
 
 ## Використані Flask-компоненти
 
@@ -473,11 +545,12 @@ flask_pet_project_pomodoro_timer_2026/
 Призначення:
 
 - показує таймер
-- дає кнопки `Start`, `Pause`, `Resume`, `Reset`
+- дає кнопки `Start`, `Pause`, `Resume`, `Reset`, `Skip`
 - показує кількість completed `work`-сесій через денну статистику
 - містить Bootstrap Carousel
 - дозволяє експортувати CSV
 - містить блок Google Calendar sync
+- містить незалежний опціональний Google Sheets settings/sync блок
 
 Ручна перевірка:
 
@@ -488,8 +561,9 @@ flask_pet_project_pomodoro_timer_2026/
 5. Натисніть `Start`.
 6. Натисніть `Pause`.
 7. Натисніть `Resume`.
-8. Натисніть `Reset`.
-9. Перевірте `Export CSV`.
+8. Натисніть `Skip` і переконайтеся, що наступний режим одразу має статус `Running`.
+9. Натисніть `Reset`.
+10. Перевірте `Export CSV`.
 
 ### Сторінка статистики — `/statistics`
 
@@ -532,6 +606,7 @@ flask_pet_project_pomodoro_timer_2026/
 | `Pause` | `/` | натиснути під час роботи | таймер зупиняється, `Resume` стає активною | без запису |
 | `Resume` | `/` | натиснути після паузи | countdown продовжується | без запису |
 | `Reset` | `/` | натиснути до завершення | таймер повертається у `Ready`, сесія не зберігається | без нового запису |
+| `Skip` | `/` | натиснути під час focus або break | поточний інтервал відкидається, наступний режим одразу запускається | без нового запису |
 | `Test mode 10с / 5с` | `/` | натиснути | короткий пресет стає активним | без запису |
 | `Зберегти налаштування` | `/` | змінити значення і зберегти | форма повертає повідомлення про успіх | оновлюється `user_settings` |
 | `Export CSV` | `/` | натиснути | завантажується CSV-файл | без зміни |
@@ -541,16 +616,18 @@ flask_pet_project_pomodoro_timer_2026/
 | `sound_enabled` | `/` | увімкнути / вимкнути | змінюється поведінка звуку після завершення сесії | оновлюється `user_settings.sound_enabled` |
 | Bootstrap Carousel | `/` | натиснути індикатори або `Previous` / `Next` | змінюється активний слайд | без зміни |
 | `Sync to Google Calendar` | `/` | натиснути після завершення `work`-сесії | створюється одна подія або повертається зрозуміла помилка | записується `google_calendar_event_id` |
+| Sheets `Save Settings` | `/` | disabled або повна enabled-конфігурація | зберігаються лише checkbox та Spreadsheet ID; Google request не виконується | оновлюються nullable Sheets fields у `user_settings` |
+| `Sync Completed Sessions` | `/` | натиснути після ready status | нові completed `work` rows з’являються в A:I, duplicate IDs пропускаються | SQLite не змінюється |
 
 ## Що реально перевірено в цій сесії
 
-- focused backend suite — `31 passed`
-- повний `pytest -v` — `48 passed`
+- focused integrations/pages/frontend suite — `32 passed`
+- повний `pytest -v` — `79 passed`
 - `python -m compileall app scripts run.py`
 - `ruff check .`
 - `black --check .`
 - `flask --app run.py routes`
-- `python scripts/check_database.py` — знайдено `29` локальних сесій
+- `python scripts/check_database.py` — read-only перевірка знайшла `34` локальні сесії
 - `googleapiclient` і `google.auth` імпортуються, `pip check` не знаходить конфліктів
 - live HTTP smoke:
   - `/` і `/api/health` повертають `200`
@@ -559,6 +636,15 @@ flask_pet_project_pomodoro_timer_2026/
   - sync без credentials повертає `400 validation_error`, а не падіння застосунку
 - browser smoke підтвердив завантаження `clock-face.gif`, показ анімації лише
   під час Running і відсутність console errors
+- browser smoke підтвердив `work -> Skip -> short_break -> Skip -> work`, статус
+  `Running`, незмінний session count для пропусків і окремий облік нормально
+  завершених focus/break інтервалів
+- browser smoke на temporary SQLite підтвердив загальну `Save Settings`, Sheets
+  Save у disabled mode, контрольовану missing-credentials помилку, disabled Sync
+  до readiness, mocked click-path для обох sync-кнопок і відхилення Calendar
+  embed URL до Google request
+- фінальна desktop/dark/mobile перевірка integration cards: без horizontal
+  overflow, `0` console errors, `0` warnings
 - Dockerfile прочитано й команди звірено; image build не запускався, бо локальний
   Docker Desktop/daemon був зупинений
 
@@ -566,6 +652,9 @@ flask_pet_project_pomodoro_timer_2026/
 
 - таймер активної сесії зберігається в `localStorage`, а не синхронізується між браузерами
 - реальна подія Google Calendar не створювалася в цій сесії без зовнішніх credentials
+- реальні Google Sheets rows не створювалися без зовнішніх credentials і shared spreadsheet
+- Sheets duplicate protection залежить від незмінності першої ID-колонки; для
+  великої таблиці повне читання A:I треба буде оптимізувати
 - у проєкті все ще доступний dev-маршрут `/api/docs` від Flask-Smorest, але він не потрібен для HR-перевірки
 - немає авторизації й мультикористувацького режиму
 - локальна SQLite підходить для навчання й демо, але не для серйозного production-сценарію

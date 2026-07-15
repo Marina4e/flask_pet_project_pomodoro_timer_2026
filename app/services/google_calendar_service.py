@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 
 from flask import current_app
 from sqlalchemy.exc import SQLAlchemyError
@@ -14,6 +15,13 @@ from app.time_utils import to_local_datetime
 
 class GoogleCalendarService:
     CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.events"
+    CALENDAR_URL_PATTERN = re.compile(r"^https?://", re.IGNORECASE)
+    REQUIRED_CREDENTIAL_FIELDS = (
+        "type",
+        "client_email",
+        "private_key",
+        "token_uri",
+    )
 
     def __init__(
         self,
@@ -33,11 +41,13 @@ class GoogleCalendarService:
         if not credentials_json:
             missing.append("GOOGLE_CALENDAR_CREDENTIALS_JSON")
 
+        calendar_id_valid = self._is_calendar_id_valid(calendar_id)
         latest_work_session = self.repository.get_latest_work_session()
 
         return {
-            "configured": not missing,
+            "configured": not missing and calendar_id_valid,
             "calendar_id": calendar_id,
+            "calendar_id_valid": calendar_id_valid,
             "missing": missing,
             "latest_work_session_id": (
                 latest_work_session.id if latest_work_session is not None else None
@@ -51,6 +61,11 @@ class GoogleCalendarService:
         self, timezone_name: str | None = None
     ) -> dict[str, object]:
         status = self.get_status()
+        if status["calendar_id"] and not status["calendar_id_valid"]:
+            raise ValidationAppError(
+                "Google Calendar ID is invalid. Use the Calendar ID from "
+                "Google Calendar settings, not an embed or sharing URL."
+            )
         if not status["configured"]:
             raise ValidationAppError(
                 "Google Calendar integration is not configured",
@@ -167,8 +182,53 @@ class GoogleCalendarService:
                 "GOOGLE_CALENDAR_CREDENTIALS_JSON is not valid JSON"
             ) from exc
 
-        credentials = Credentials.from_service_account_info(
-            credentials_info,
-            scopes=[cls.CALENDAR_SCOPE],
+        missing_fields = cls._missing_credential_fields(credentials_info)
+        if missing_fields:
+            raise ValidationAppError(
+                "Google Calendar credentials are invalid or incomplete",
+                details={"missing_fields": missing_fields},
+            )
+
+        try:
+            credentials = Credentials.from_service_account_info(
+                credentials_info,
+                scopes=[cls.CALENDAR_SCOPE],
+            )
+            return build(
+                "calendar",
+                "v3",
+                credentials=credentials,
+                cache_discovery=False,
+            )
+        except Exception as exc:  # pragma: no cover - dependency wrapper
+            current_app.logger.error(
+                "Google Calendar client initialization failed (%s)",
+                type(exc).__name__,
+            )
+            raise ValidationAppError(
+                "Google Calendar credentials are invalid or incomplete"
+            ) from exc
+
+    @classmethod
+    def _missing_credential_fields(cls, credentials_info: object) -> list[str]:
+        if not isinstance(credentials_info, dict):
+            return list(cls.REQUIRED_CREDENTIAL_FIELDS)
+
+        missing = [
+            field
+            for field in cls.REQUIRED_CREDENTIAL_FIELDS
+            if not str(credentials_info.get(field, "")).strip()
+        ]
+        if credentials_info.get("type") != "service_account" and "type" not in missing:
+            missing.append("type")
+        return missing
+
+    @classmethod
+    def _is_calendar_id_valid(cls, calendar_id: object) -> bool:
+        if not isinstance(calendar_id, str) or not calendar_id.strip():
+            return False
+
+        value = calendar_id.strip()
+        return not cls.CALENDAR_URL_PATTERN.match(value) and not any(
+            character.isspace() for character in value
         )
-        return build("calendar", "v3", credentials=credentials, cache_discovery=False)

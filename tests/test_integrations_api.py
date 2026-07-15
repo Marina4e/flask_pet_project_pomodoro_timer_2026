@@ -51,7 +51,38 @@ def test_google_calendar_status_reports_not_configured(client):
     assert response.status_code == 200
     payload = response.get_json()
     assert payload["configured"] is False
+    assert payload["calendar_id_valid"] is False
     assert "GOOGLE_CALENDAR_ID" in payload["missing"]
+
+
+def test_google_calendar_rejects_embed_url_before_building_client(
+    app, client, monkeypatch
+):
+    app.config["GOOGLE_CALENDAR_ID"] = (
+        "https://calendar.google.com/calendar/embed?src=calendar%40example.com"
+    )
+    app.config["GOOGLE_CALENDAR_CREDENTIALS_JSON"] = '{"type":"service_account"}'
+    monkeypatch.setattr(
+        GoogleCalendarService,
+        "_build_calendar_service",
+        classmethod(
+            lambda cls: (_ for _ in ()).throw(
+                AssertionError("Calendar client must not be built for an embed URL")
+            )
+        ),
+    )
+
+    status_response = client.get("/api/integrations/google-calendar/status")
+    sync_response = client.post(
+        "/api/integrations/google-calendar/sync",
+        json={"timezone": "UTC"},
+    )
+
+    assert status_response.status_code == 200
+    assert status_response.get_json()["configured"] is False
+    assert status_response.get_json()["calendar_id_valid"] is False
+    assert sync_response.status_code == 400
+    assert "not an embed or sharing URL" in str(sync_response.get_json())
 
 
 def test_google_calendar_sync_requires_configuration(client):

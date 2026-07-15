@@ -29,6 +29,12 @@ class GoogleSheetsService:
         "Created At",
     ]
     SPREADSHEET_ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]{20,200}$")
+    REQUIRED_CREDENTIAL_FIELDS = (
+        "type",
+        "client_email",
+        "private_key",
+        "token_uri",
+    )
 
     def __init__(
         self,
@@ -39,6 +45,8 @@ class GoogleSheetsService:
         self.settings_service = settings_service or SettingsService()
 
     def get_settings_payload(self) -> dict[str, object]:
+        """Return only browser-safe Sheets settings and readiness flags."""
+
         settings = self.settings_service.get_settings()
         enabled = settings.google_sheets_enabled
         spreadsheet_id = settings.google_sheets_spreadsheet_id
@@ -48,23 +56,48 @@ class GoogleSheetsService:
         if spreadsheet_id is None:
             spreadsheet_id = current_app.config["GOOGLE_SHEETS_SPREADSHEET_ID"]
 
+        resolved_spreadsheet_id = spreadsheet_id or ""
+        spreadsheet_id_valid = bool(
+            resolved_spreadsheet_id
+            and self.SPREADSHEET_ID_PATTERN.fullmatch(resolved_spreadsheet_id)
+        )
+        resolved_enabled = bool(enabled)
+        credentials_configured = bool(
+            current_app.config["GOOGLE_SHEETS_CREDENTIALS_JSON"]
+        )
+        credentials_valid = False
+        if resolved_enabled and credentials_configured:
+            try:
+                self._parse_credentials_info()
+            except ValidationAppError:
+                credentials_valid = False
+            else:
+                credentials_valid = True
+
         return {
-            "enabled": bool(enabled),
-            "spreadsheet_id": spreadsheet_id or "",
-            "credentials_configured": bool(
-                current_app.config["GOOGLE_SHEETS_CREDENTIALS_JSON"]
-            ),
+            "enabled": resolved_enabled,
+            "configured": spreadsheet_id_valid and credentials_valid,
+            "spreadsheet_id": resolved_spreadsheet_id,
+            "spreadsheet_id_valid": spreadsheet_id_valid,
+            "credentials_configured": credentials_configured,
+            "credentials_valid": credentials_valid,
         }
 
     def update_settings(self, payload: dict[str, object]) -> dict[str, object]:
+        """Persist the non-secret enable flag and Spreadsheet ID in SQLite."""
+
         enabled = bool(payload["enabled"])
         spreadsheet_id = str(payload["spreadsheet_id"]).strip()
-        self._validate_spreadsheet_id(spreadsheet_id)
 
-        if enabled and not spreadsheet_id:
-            raise ValidationAppError(
-                "Spreadsheet ID is required when Google Sheets is enabled"
-            )
+        if enabled:
+            if not spreadsheet_id:
+                raise ValidationAppError(
+                    "Spreadsheet ID is required when Google Sheets is enabled"
+                )
+            self._validate_spreadsheet_id(spreadsheet_id)
+            if not current_app.config["GOOGLE_SHEETS_CREDENTIALS_JSON"]:
+                raise ValidationAppError("Google Sheets credentials are missing")
+            self._parse_credentials_info()
 
         settings = self.settings_service.get_settings()
         settings.google_sheets_enabled = enabled
@@ -79,8 +112,10 @@ class GoogleSheetsService:
         return self.get_settings_payload()
 
     def sync_completed_sessions(self) -> dict[str, object]:
+        """Append completed work sessions whose stable IDs are not in the sheet."""
+
         settings = self.get_settings_payload()
-        self._validate_sync_configuration(settings)
+        credentials_info = self.validate_configuration(settings)
 
         spreadsheet_id = str(settings["spreadsheet_id"])
         timezone_name = self.settings_service.get_settings().timezone
@@ -88,7 +123,7 @@ class GoogleSheetsService:
             self.repository.list_sessions(mode="work"),
             key=lambda session: session.completed_at_utc,
         )
-        sheets_service = self._build_sheets_service()
+        sheets_service = self._build_sheets_service(credentials_info)
 
         try:
             values_resource = sheets_service.spreadsheets().values()
@@ -125,16 +160,16 @@ class GoogleSheetsService:
             raise
         except Exception as exc:  # pragma: no cover - external API wrapper
             current_app.logger.error(
-                "Google Sheets sync failed (%s)",
+                "Google Sheets sync failed (%s, status=%s)",
                 type(exc).__name__,
+                getattr(getattr(exc, "resp", None), "status", None),
             )
-            raise ValidationAppError(
-                "Google Sheets sync failed. Check the spreadsheet ID, API access, "
-                "credentials, and sharing permissions."
-            ) from exc
+            raise ValidationAppError(self._safe_external_error_message(exc)) from exc
 
         skipped = len(sessions) - len(rows)
         return {
+            "success": True,
+            "integration": "google_sheets",
             "status": "success",
             "spreadsheet_id": spreadsheet_id,
             "exported": len(rows),
@@ -192,23 +227,66 @@ class GoogleSheetsService:
             created_local.isoformat(),
         ]
 
-    def _validate_sync_configuration(self, settings: dict[str, object]) -> None:
-        if not settings["enabled"]:
+    def is_enabled(self) -> bool:
+        """Return the resolved feature flag without validating optional secrets."""
+
+        return bool(self.get_settings_payload()["enabled"])
+
+    def validate_configuration(
+        self, settings: dict[str, object] | None = None
+    ) -> dict[str, object]:
+        """Validate enabled Sheets configuration and return parsed credentials."""
+
+        resolved_settings = settings or self.get_settings_payload()
+        if not resolved_settings["enabled"]:
             raise ValidationAppError("Google Sheets integration is disabled")
-        if not settings["spreadsheet_id"]:
+        if not resolved_settings["spreadsheet_id"]:
             raise ValidationAppError("Google Sheets spreadsheet ID is missing")
-        if not settings["credentials_configured"]:
+        if not resolved_settings["credentials_configured"]:
             raise ValidationAppError("Google Sheets credentials are missing")
 
-        self._validate_spreadsheet_id(str(settings["spreadsheet_id"]))
+        self._validate_spreadsheet_id(str(resolved_settings["spreadsheet_id"]))
+        return self._parse_credentials_info()
 
     def _validate_spreadsheet_id(self, spreadsheet_id: str) -> None:
         if spreadsheet_id and not self.SPREADSHEET_ID_PATTERN.fullmatch(spreadsheet_id):
             raise ValidationAppError("Google Sheets spreadsheet ID is invalid")
 
     @classmethod
-    def _build_sheets_service(cls):
+    def _parse_credentials_info(cls) -> dict[str, object]:
         credentials_json = current_app.config["GOOGLE_SHEETS_CREDENTIALS_JSON"]
+
+        try:
+            credentials_info = json.loads(credentials_json)
+        except json.JSONDecodeError as exc:
+            raise ValidationAppError(
+                "GOOGLE_SHEETS_CREDENTIALS_JSON is not valid JSON"
+            ) from exc
+
+        if not isinstance(credentials_info, dict):
+            missing_fields = list(cls.REQUIRED_CREDENTIAL_FIELDS)
+        else:
+            missing_fields = [
+                field
+                for field in cls.REQUIRED_CREDENTIAL_FIELDS
+                if not str(credentials_info.get(field, "")).strip()
+            ]
+            if (
+                credentials_info.get("type") != "service_account"
+                and "type" not in missing_fields
+            ):
+                missing_fields.append("type")
+
+        if missing_fields:
+            raise ValidationAppError(
+                "Google Sheets credentials are invalid or incomplete",
+                details={"missing_fields": missing_fields},
+            )
+
+        return credentials_info
+
+    @classmethod
+    def _build_sheets_service(cls, credentials_info: dict[str, object]):
 
         try:
             from google.oauth2.service_account import Credentials
@@ -217,13 +295,6 @@ class GoogleSheetsService:
             raise ValidationAppError(
                 "Google Sheets dependencies are missing. "
                 "Run pip install -r requirements.txt."
-            ) from exc
-
-        try:
-            credentials_info = json.loads(credentials_json)
-        except json.JSONDecodeError as exc:
-            raise ValidationAppError(
-                "GOOGLE_SHEETS_CREDENTIALS_JSON is not valid JSON"
             ) from exc
 
         try:
@@ -245,3 +316,16 @@ class GoogleSheetsService:
             raise ValidationAppError(
                 "Google Sheets credentials are invalid or incomplete"
             ) from exc
+
+    @staticmethod
+    def _safe_external_error_message(exc: Exception) -> str:
+        status_code = getattr(getattr(exc, "resp", None), "status", None)
+        if status_code in {403, 404}:
+            return (
+                "The service account cannot access the spreadsheet. Check the "
+                "Spreadsheet ID and share the sheet with the service-account email."
+            )
+        return (
+            "Google Sheets sync failed. Check the spreadsheet ID, API access, "
+            "credentials, and sharing permissions."
+        )

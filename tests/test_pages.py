@@ -20,6 +20,8 @@ def test_home_page_contains_expected_ui(client):
     assert 'href="/#timer-widget"' in html
     assert 'href="/statistics"' in html
     assert 'id="timer-widget"' in html
+    assert 'id="skip-timer-button"' in html
+    assert 'aria-label="Skip current focus or break"' in html
     assert 'href="/#settings-panel"' in html
     assert 'id="settings-panel"' in html
     assert "styles.css" in html
@@ -32,7 +34,13 @@ def test_home_page_contains_expected_ui(client):
     assert "Google Sheets Settings" in html
     assert 'id="google-sheets-enabled-input"' in html
     assert 'id="google-sheets-spreadsheet-id-input"' in html
-    assert "GOOGLE_SHEETS_CREDENTIALS_JSON" not in html
+    assert 'id="google-sheets-credentials-input"' not in html
+    assert 'name="GOOGLE_SHEETS_CREDENTIALS_JSON"' not in html
+    assert "Optional feature" in html
+    assert "Required only when enabled" in html
+    assert 'id="google-calendar-sync-button"' in html
+    assert 'id="google-sheets-save-button"' in html
+    assert 'id="google-sheets-sync-button"' in html
     assert 'lang="en"' in html
     assert "images/tomato-idle-transparent.png" in html
     timer_runner = html.split('id="timer-tomato-runner"', 1)[1].split("</div>", 1)[0]

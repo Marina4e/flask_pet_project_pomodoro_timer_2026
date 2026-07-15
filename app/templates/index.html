@@ -278,104 +278,248 @@
     {% include "components/settings_panel.html" %}
   </section>
 
-  <section class="dashboard-grid">
-    <article class="card info-card google-calendar-card" id="google-calendar-card">
-      <div class="card-heading">
-        <div>
-          <p class="eyebrow">Google Calendar</p>
-          <h2>Sync latest work session</h2>
-        </div>
-        <span class="status-pill" id="google-calendar-status-pill">Checking</span>
+  <section class="dashboard-grid integrations-grid" aria-labelledby="google-integrations-title">
+    <article class="card integrations-intro">
+      <div>
+        <p class="eyebrow">Optional Google connections</p>
+        <h2 id="google-integrations-title">Keep time in SQLite first, then send a copy to Google</h2>
+        <p class="helper-text mb-0">
+          The timer, focus and break statistics, activity calendar, and CSV export work
+          without either Google integration. Connect only the service you actually need.
+        </p>
       </div>
-      <p class="helper-text" id="google-calendar-status-message">
-        Checking whether Google Calendar credentials and calendar ID are configured.
-      </p>
-      <div class="sync-summary" id="google-calendar-summary">
-        <div>
-          <span class="sync-label">Calendar ID</span>
-          <strong id="google-calendar-id-label">Not configured</strong>
-        </div>
-        <div>
-          <span class="sync-label">Latest work session</span>
-          <strong id="google-calendar-session-label">-</strong>
-        </div>
+      <div class="integration-legend" aria-label="Setup legend">
+        <span class="requirement-badge requirement-badge-optional">Optional feature</span>
+        <span class="requirement-badge requirement-badge-required">Required only when enabled</span>
       </div>
-      <button class="btn button button-primary hidden" id="google-calendar-sync-button" type="button">
-        Sync to Google Calendar
-      </button>
-      <p class="helper-text">
-        The button creates one Google Calendar event for the latest completed work session
-        after `.env` is configured.
-      </p>
     </article>
 
-    <article class="card info-card" id="google-sheets-card">
-      <div class="card-heading">
-        <div>
-          <p class="eyebrow">Optional Integration</p>
-          <h2>Completed session export</h2>
-        </div>
-      </div>
-      <div class="accordion settings-advanced" id="google-sheets-settings-accordion">
-        <div class="accordion-item">
-          <h3 class="accordion-header" id="google-sheets-settings-heading">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#google-sheets-settings-panel"
-              aria-expanded="false"
-              aria-controls="google-sheets-settings-panel"
-            >
-              Google Sheets Settings
-            </button>
-          </h3>
-          <div
-            class="accordion-collapse collapse"
-            id="google-sheets-settings-panel"
-            aria-labelledby="google-sheets-settings-heading"
+    <article class="card info-card integration-card" id="google-calendar-card">
+      <div class="integration-card-layout">
+        <div class="integration-card-main">
+          <div class="card-heading">
+            <div>
+              <div class="integration-label-row">
+                <p class="eyebrow">Google Calendar</p>
+                <span class="requirement-badge requirement-badge-optional">Optional</span>
+              </div>
+              <h2>Save the latest focus session as an event</h2>
+            </div>
+            <span class="status-pill" id="google-calendar-status-pill" data-state="loading">Checking</span>
+          </div>
+          <p
+            class="helper-text integration-status-message"
+            id="google-calendar-status-message"
+            data-state="loading"
+            role="status"
+            aria-live="polite"
           >
-            <div class="accordion-body">
-              <div class="form-grid">
-                <label class="checkbox-label" for="google-sheets-enabled-input">
-                  <input id="google-sheets-enabled-input" type="checkbox">
-                  Enable Google Sheets export
-                </label>
-                <div class="setting-field">
-                  <label for="google-sheets-spreadsheet-id-input">Spreadsheet ID</label>
-                  <input
-                    class="form-control"
-                    id="google-sheets-spreadsheet-id-input"
-                    type="text"
-                    autocomplete="off"
-                    aria-describedby="google-sheets-id-help"
+            Checking whether Google Calendar credentials and Calendar ID are configured.
+          </p>
+          <div class="sync-summary" id="google-calendar-summary">
+            <div>
+              <span class="sync-label">Calendar ID from Google settings</span>
+              <strong id="google-calendar-id-label">Checking</strong>
+            </div>
+            <div>
+              <span class="sync-label">Latest completed focus</span>
+              <strong id="google-calendar-session-label">Checking</strong>
+            </div>
+          </div>
+          <div class="integration-action-card">
+            <button
+              class="btn button button-primary"
+              id="google-calendar-sync-button"
+              type="button"
+              aria-describedby="google-calendar-button-help"
+              disabled
+            >
+              Sync to Google Calendar
+            </button>
+            <p class="helper-text mb-0" id="google-calendar-button-help">
+              <strong>Button logic:</strong> creates one event for the latest completed
+              <code>work</code> session. It does not export breaks, does not run automatically,
+              and blocks a second event for the same session.
+            </p>
+          </div>
+          <p class="integration-result-note mb-0">
+            <strong>Where to check:</strong> open the shared Google Calendar and find the
+            “Pomodoro focus session” event at the completed session time.
+          </p>
+        </div>
+
+        <aside class="integration-help-panel" aria-label="Google Calendar setup steps">
+          <div class="integration-help-heading">
+            <span class="requirement-badge requirement-badge-required">Required for Calendar sync</span>
+            <h3>Set up once, then use the button</h3>
+          </div>
+          <ol class="integration-steps">
+            <li>
+              In Google Calendar open <strong>Settings and sharing → Integrate calendar</strong>
+              and copy <strong>Calendar ID</strong>. Do not copy the embed URL.
+            </li>
+            <li>
+              Put that value in <code>GOOGLE_CALENDAR_ID</code> and one-line service-account
+              JSON in <code>GOOGLE_CALENDAR_CREDENTIALS_JSON</code> inside server <code>.env</code>.
+            </li>
+            <li>
+              Share the calendar with the service account’s <code>client_email</code> and allow
+              it to make changes to events.
+            </li>
+            <li>
+              Restart Flask, complete one focus interval, then click
+              <strong>Sync to Google Calendar</strong>.
+            </li>
+          </ol>
+          <p class="optional-note mb-0">
+            <span class="requirement-badge requirement-badge-optional">Optional</span>
+            <code>GOOGLE_CALENDAR_EVENT_PREFIX</code> and event color only customize the event.
+          </p>
+        </aside>
+      </div>
+    </article>
+
+    <article class="card info-card integration-card" id="google-sheets-card">
+      <div class="integration-card-layout">
+        <div class="integration-card-main">
+          <div class="card-heading">
+            <div>
+              <div class="integration-label-row">
+                <p class="eyebrow">Google Sheets</p>
+                <span class="requirement-badge requirement-badge-optional">Optional</span>
+              </div>
+              <h2>Export completed focus sessions as rows</h2>
+            </div>
+            <span class="status-pill" id="google-sheets-status-pill" data-state="loading">Checking</span>
+          </div>
+          <div class="accordion settings-advanced" id="google-sheets-settings-accordion">
+            <div class="accordion-item">
+              <h3 class="accordion-header" id="google-sheets-settings-heading">
+                <button
+                  class="accordion-button"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#google-sheets-settings-panel"
+                  aria-expanded="true"
+                  aria-controls="google-sheets-settings-panel"
+                >
+                  Google Sheets Settings
+                </button>
+              </h3>
+              <div
+                class="accordion-collapse collapse show"
+                id="google-sheets-settings-panel"
+                aria-labelledby="google-sheets-settings-heading"
+              >
+                <div class="accordion-body">
+                  <div class="form-grid integration-settings-grid">
+                    <label class="checkbox-label" for="google-sheets-enabled-input">
+                      <input id="google-sheets-enabled-input" type="checkbox">
+                      Enable Google Sheets export
+                      <span class="requirement-badge requirement-badge-optional">Optional switch</span>
+                    </label>
+                    <div class="setting-field">
+                      <label for="google-sheets-spreadsheet-id-input">
+                        Spreadsheet ID
+                        <span class="requirement-badge requirement-badge-required">Required when enabled</span>
+                      </label>
+                      <input
+                        class="form-control"
+                        id="google-sheets-spreadsheet-id-input"
+                        type="text"
+                        autocomplete="off"
+                        aria-describedby="google-sheets-id-help"
+                      >
+                      <small class="helper-text" id="google-sheets-id-help">
+                        Copy only the value between <code>/d/</code> and <code>/edit</code>
+                        in the Google Sheets URL, not the whole URL.
+                      </small>
+                    </div>
+                  </div>
+                  <div class="credential-status-row">
+                    <span>Service-account credentials on Flask server</span>
+                    <strong id="google-sheets-credentials-label">Checking</strong>
+                  </div>
+                  <div class="settings-actions integration-settings-actions">
+                    <button
+                      class="btn button button-ghost"
+                      id="google-sheets-save-button"
+                      type="button"
+                      aria-describedby="google-sheets-save-help"
+                    >
+                      Save Settings
+                    </button>
+                    <button
+                      class="btn button button-primary"
+                      id="google-sheets-sync-button"
+                      type="button"
+                      aria-describedby="google-sheets-sync-help"
+                      disabled
+                    >
+                      Sync Completed Sessions
+                    </button>
+                  </div>
+                  <div class="button-purpose-grid">
+                    <p class="helper-text mb-0" id="google-sheets-save-help">
+                      <strong>Save Settings:</strong> validates the enabled setup and stores only
+                      the switch and Spreadsheet ID in SQLite. It sends no rows to Google.
+                    </p>
+                    <p class="helper-text mb-0" id="google-sheets-sync-help">
+                      <strong>Sync Completed Sessions:</strong> reads completed
+                      <code>work</code> records, creates the A:I header if needed, and appends only
+                      Session IDs that are not already present.
+                    </p>
+                  </div>
+                  <p
+                    class="helper-text integration-status-message mb-0"
+                    id="google-sheets-status-message"
+                    data-state="loading"
+                    role="status"
+                    aria-live="polite"
                   >
-                  <small class="helper-text" id="google-sheets-id-help">
-                    Use the ID between <code>/d/</code> and <code>/edit</code> in the sheet URL.
-                  </small>
+                    Loading Google Sheets settings.
+                  </p>
                 </div>
               </div>
-              <p class="helper-text">
-                Service-account credentials stay on the Flask server and are never stored in the browser.
-              </p>
-              <div class="settings-actions">
-                <button class="btn button button-ghost" id="google-sheets-save-button" type="button">
-                  Save Settings
-                </button>
-                <button class="btn button button-primary" id="google-sheets-sync-button" type="button">
-                  Sync Completed Sessions
-                </button>
-              </div>
-              <p class="helper-text" id="google-sheets-status-message" role="status">
-                Loading Google Sheets settings.
-              </p>
             </div>
           </div>
         </div>
+
+        <aside class="integration-help-panel" aria-label="Google Sheets setup steps">
+          <div class="integration-help-heading">
+            <span class="requirement-badge requirement-badge-required">Required only after enabling</span>
+            <h3>From Google Cloud to the spreadsheet</h3>
+          </div>
+          <ol class="integration-steps">
+            <li>Enable <strong>Google Sheets API</strong> and create a service account in Google Cloud.</li>
+            <li>Create its JSON key and keep that file outside the repository.</li>
+            <li>
+              Share the target spreadsheet with the JSON <code>client_email</code> as
+              <strong>Editor</strong>.
+            </li>
+            <li>
+              Put compressed one-line JSON in <code>GOOGLE_SHEETS_CREDENTIALS_JSON</code>,
+              set <code>GOOGLE_SHEETS_ENABLED=true</code>, and restart Flask.
+            </li>
+            <li>
+              Enter the Spreadsheet ID here, click <strong>Save Settings</strong>, then
+              <strong>Sync Completed Sessions</strong>.
+            </li>
+          </ol>
+          <p class="integration-result-note">
+            <strong>Where to check:</strong> the first worksheet receives columns A:I. Run sync
+            twice—the second run should report duplicates as skipped, without extra rows.
+          </p>
+          <p class="optional-note mb-0">
+            <span class="requirement-badge requirement-badge-optional">Safe when off</span>
+            With Sheets disabled, credentials and Spreadsheet ID stay unvalidated and no Google
+            client or network request is created.
+          </p>
+        </aside>
       </div>
     </article>
 
-    <article class="card info-card">
+    <article class="card info-card timer-logic-card">
       <div class="card-heading">
         <div>
           <p class="eyebrow">How it works</p>

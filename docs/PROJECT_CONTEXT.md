@@ -7,7 +7,7 @@ that a reviewer can inspect quickly.
 ## Main Features
 
 - work, short-break, and long-break timer modes
-- `Start`, `Pause`, `Resume`, `Reset`
+- `Start`, `Pause`, `Resume`, `Reset`, `Skip`
 - local test mode via `POMODORO_TEST_MODE=true`
 - automatic local SQLite initialization on first run
 - completed-session persistence in SQLite
@@ -22,6 +22,8 @@ that a reviewer can inspect quickly.
 
 - active countdown state lives in the browser
 - completed sessions are saved through Flask API
+- skipped focus and break intervals are not saved; the next mode starts immediately
+- completed focus and break durations are tracked separately and combined in total time
 - duplicate session inserts are prevented by `client_session_id`
 - Google Calendar duplicate sync is prevented by `google_calendar_event_id`
 - stored timestamps are UTC; display conversions use the selected timezone

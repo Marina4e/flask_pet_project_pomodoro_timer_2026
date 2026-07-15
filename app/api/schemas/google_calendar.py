@@ -6,6 +6,7 @@ from marshmallow import Schema, fields
 class GoogleCalendarStatusSchema(Schema):
     configured = fields.Bool(required=True)
     calendar_id = fields.Str(required=True, allow_none=True)
+    calendar_id_valid = fields.Bool(required=True)
     missing = fields.List(fields.Str(), required=True)
     latest_work_session_id = fields.Int(required=False, allow_none=True)
     latest_work_session_synced = fields.Bool(required=True)

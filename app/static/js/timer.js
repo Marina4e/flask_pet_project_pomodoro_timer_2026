@@ -42,6 +42,7 @@
     pause: document.getElementById("pause-timer-button"),
     resume: document.getElementById("resume-timer-button"),
     reset: document.getElementById("reset-timer-button"),
+    skip: document.getElementById("skip-timer-button"),
     modeButtons: document.querySelectorAll(".mode-button"),
     presetButtons: document.querySelectorAll(".preset-button"),
     cycleNote: document.getElementById("timer-cycle-note"),
@@ -147,6 +148,14 @@
     return { nextMode: "work", nextCycleCount: 0 };
   }
 
+  function getSkippedTransition(currentMode, currentCycleCount) {
+    if (currentMode === "work") {
+      return { nextMode: "short_break", nextCycleCount: currentCycleCount };
+    }
+
+    return getNextTransition(currentMode, currentCycleCount);
+  }
+
   function formatDuration(seconds) {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -220,6 +229,7 @@
     elements.reset.disabled =
       state.status === "idle" &&
       state.remainingSeconds === state.plannedDurationSeconds;
+    elements.skip.disabled = state.status === "completed";
 
     updateRunnerState(state.status);
   }
@@ -390,6 +400,22 @@
     updateUi();
   }
 
+  function skipTimer() {
+    stopInterval();
+    stopPendingTransition();
+
+    const skippedMode = state.mode;
+    const transition = getSkippedTransition(state.mode, state.cycleCount);
+    state = defaultState(transition.nextMode, {
+      cycleCount: transition.nextCycleCount,
+      activePreset: getActivePreset(),
+    });
+
+    startTimer();
+    elements.message.textContent =
+      `Skipped ${prettyMode(skippedMode)}. Started ${prettyMode(transition.nextMode)}.`;
+  }
+
   function prepareNextSession(nextMode, nextCycleCount, shouldAutoStart) {
     stopPendingTransition();
     state = defaultState(nextMode, {
@@ -497,6 +523,7 @@
   elements.pause.addEventListener("click", pauseTimer);
   elements.resume.addEventListener("click", resumeTimer);
   elements.reset.addEventListener("click", resetTimer);
+  elements.skip.addEventListener("click", skipTimer);
 
   elements.modeButtons.forEach((button) => {
     button.addEventListener("click", () => changeMode(button.dataset.mode));
