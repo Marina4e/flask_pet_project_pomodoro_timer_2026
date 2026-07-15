@@ -1,5 +1,43 @@
 # Журнал роботи
 
+## 2026-07-15 — Google Sheets integration and 3D clock states
+
+### Мета
+
+Додати невелику опціональну Google Sheets integration поруч із наявним Google
+Calendar та замінити другий томат у таймері на виразний 3D-годинник, не
+змінюючи інші модулі проєкту.
+
+### Виконана робота
+
+- Згенеровано теплу beige/burgundy 3D-основу годинника через image generation,
+  локально додано об'ємні стрілки й тіні, створено static PNG та optimized GIF.
+- GIF фізично завантажується тільки у стані `running`; pause, completion і reset
+  видаляють `src` та показують static PNG.
+- Додано server-side Sheets service на `google-api-python-client` і
+  `google-auth`, окремі routes/schemas та контрольовані помилки.
+- Реалізовано експорт завершених `work`-сесій у дев'ять колонок і дедуплікацію
+  через наявний `client_session_id` без нової колонки в `work_sessions`.
+- Додано safe settings у `user_settings`, міграцію та compact accordion у UI;
+  credentials не потрапляють у HTML або browser storage.
+- Оновлено README, status, changelog і file map.
+
+### Перевірка
+
+- focused pytest — PASSED (`17 passed`)
+- full pytest — PASSED (`61 passed`)
+- Playwright clock flow — Ready, Running, Pause, Resume, Completed, Reset PASSED
+- Reset у live smoke не змінив кількість database sessions
+- Sheets ID/Enable save + reload — PASSED
+- missing credentials error — PASSED без raw Google details
+- final browser console — `0 errors`, `0 warnings`
+
+### Не змінено
+
+- Google Calendar service/routes і його SQLite duplicate marker
+- statistics, calendar views, CSV, Docker, authentication і timer architecture
+- `requirements.txt`, оскільки потрібні Google client libraries уже оголошені
+
 ## 2026-07-14 — Аудит, SQLite bootstrap, test mode, and Google Calendar
 
 ### Мета

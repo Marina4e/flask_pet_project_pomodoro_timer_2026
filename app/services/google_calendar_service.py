@@ -89,13 +89,23 @@ class GoogleCalendarService:
             db.session.commit()
         except SQLAlchemyError as exc:
             db.session.rollback()
+            current_app.logger.error(
+                "Google Calendar event could not be stored for session %s (%s)",
+                session.id,
+                type(exc).__name__,
+            )
             raise ValidationAppError(
                 "Calendar event was created but could not be stored locally"
             ) from exc
         except Exception as exc:  # pragma: no cover - external API wrapper
+            current_app.logger.error(
+                "Google Calendar sync failed for session %s (%s)",
+                session.id,
+                type(exc).__name__,
+            )
             raise ValidationAppError(
-                "Failed to create Google Calendar event",
-                details={"reason": str(exc)},
+                "Failed to create Google Calendar event. Check the Calendar ID, "
+                "API access, credentials, and sharing permissions."
             ) from exc
 
         return {

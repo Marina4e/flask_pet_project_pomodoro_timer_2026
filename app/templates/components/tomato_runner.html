@@ -1,15 +1,15 @@
 <div class="tomato-hero {{ runner_classes|default('') }}" id="{{ runner_id|default('tomato-runner') }}" data-runner="idle" aria-hidden="true">
   <img
-    class="tomato-asset tomato-asset-idle"
-    src="{{ url_for('static', filename='images/tomato-idle.png') }}"
+    class="tomato-asset tomato-asset-idle clock-asset-static"
+    src="{{ url_for('static', filename='images/clock-face-static.png') }}"
     alt=""
     decoding="async"
     draggable="false"
   >
   <img
-    class="tomato-asset tomato-asset-running"
-    src="{{ url_for('static', filename='images/tomato-bounce.gif') }}"
-    alt=""
+    class="tomato-asset tomato-asset-running clock-asset-running"
+    data-animated-src="{{ url_for('static', filename='images/clock-face.gif') }}"
+    alt="Animated clock face with slowly moving hands"
     decoding="async"
     draggable="false"
   >

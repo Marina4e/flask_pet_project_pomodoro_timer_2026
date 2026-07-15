@@ -309,6 +309,72 @@
       </p>
     </article>
 
+    <article class="card info-card" id="google-sheets-card">
+      <div class="card-heading">
+        <div>
+          <p class="eyebrow">Optional Integration</p>
+          <h2>Completed session export</h2>
+        </div>
+      </div>
+      <div class="accordion settings-advanced" id="google-sheets-settings-accordion">
+        <div class="accordion-item">
+          <h3 class="accordion-header" id="google-sheets-settings-heading">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#google-sheets-settings-panel"
+              aria-expanded="false"
+              aria-controls="google-sheets-settings-panel"
+            >
+              Google Sheets Settings
+            </button>
+          </h3>
+          <div
+            class="accordion-collapse collapse"
+            id="google-sheets-settings-panel"
+            aria-labelledby="google-sheets-settings-heading"
+          >
+            <div class="accordion-body">
+              <div class="form-grid">
+                <label class="checkbox-label" for="google-sheets-enabled-input">
+                  <input id="google-sheets-enabled-input" type="checkbox">
+                  Enable Google Sheets export
+                </label>
+                <div class="setting-field">
+                  <label for="google-sheets-spreadsheet-id-input">Spreadsheet ID</label>
+                  <input
+                    class="form-control"
+                    id="google-sheets-spreadsheet-id-input"
+                    type="text"
+                    autocomplete="off"
+                    aria-describedby="google-sheets-id-help"
+                  >
+                  <small class="helper-text" id="google-sheets-id-help">
+                    Use the ID between <code>/d/</code> and <code>/edit</code> in the sheet URL.
+                  </small>
+                </div>
+              </div>
+              <p class="helper-text">
+                Service-account credentials stay on the Flask server and are never stored in the browser.
+              </p>
+              <div class="settings-actions">
+                <button class="btn button button-ghost" id="google-sheets-save-button" type="button">
+                  Save Settings
+                </button>
+                <button class="btn button button-primary" id="google-sheets-sync-button" type="button">
+                  Sync Completed Sessions
+                </button>
+              </div>
+              <p class="helper-text" id="google-sheets-status-message" role="status">
+                Loading Google Sheets settings.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
     <article class="card info-card">
       <div class="card-heading">
         <div>

@@ -5,13 +5,13 @@
 - Flask application factory with automatic local SQLite bootstrap
 - shared Flask extensions for SQLAlchemy, Flask-Migrate, and Flask-Smorest
 - SQLAlchemy models for `work_sessions` and `user_settings`
-- repository and service layers for sessions, settings, statistics, calendar, CSV, and Google Calendar sync
-- API routes for health, sessions, statistics, calendar, settings, export, and Google Calendar status/sync
-- Bootstrap 5.3 landing page with official-style carousel, timer, settings, statistics, calendar, and sync card
+- repository and service layers for sessions, settings, statistics, calendar, CSV, Google Calendar, and Google Sheets sync
+- API routes for health, sessions, statistics, calendar, settings, export, Google Calendar, and Google Sheets
+- Bootstrap 5.3 landing page with official-style carousel, state-driven clock, settings, statistics, calendar, and integration cards
 - browser timer restoration through `localStorage`
 - explicit `POMODORO_TEST_MODE` flow with `10s / 5s` preset
 - read-only `scripts/check_database.py`
-- automated pytest suite with mocked Google Calendar success and duplicate-sync coverage
+- automated pytest suite with mocked Google Calendar and Google Sheets success, duplicate protection, and controlled-error coverage
 
 ## Verified In This Session
 
@@ -41,7 +41,7 @@
 
 - Visible frontend copy is now English across the home, statistics, calendar,
   settings, timer, integration, and error pages.
-- The homepage carousel reuses `app/static/images/tomato-idle.png` on every
+- The homepage carousel reuses `app/static/images/tomato-idle-transparent.png` on every
   slide, with compact image-and-text layout and mobile image-first ordering.
 - Removed the redundant feature teaser row, compacted spacing, converted action
   controls to Bootstrap-compatible button markup, and moved secondary settings
@@ -61,9 +61,29 @@
 - The requested Windows browser smoke was attempted but stopped because the
   browser-control safety layer could not determine the current Chrome URL.
 
+## 2026-07-15 Google Sheets and Clock Animation
+
+- Added optional Google Sheets export without changing the existing Google
+  Calendar integration.
+- Safe Sheets settings (`enabled` and `spreadsheet_id`) persist in SQLite;
+  service-account JSON remains server-only in `.env`.
+- `POST /api/integrations/google-sheets/sync` exports completed `work` sessions
+  and prevents duplicates by reading stable `client_session_id` values already
+  present in the sheet.
+- Added the dedicated service, schema, blueprint, migration, compact frontend
+  accordion, and controlled error messages.
+- Replaced the second timer tomato with a generated 3D clock. Ready, paused,
+  completed, and reset states use a static PNG; running and resumed states load
+  the GIF, and removing its `src` stops animation outside `running`.
+- Full automated suite passes: `61 passed`.
+- Playwright verified all clock states, reset without a new database record,
+  Sheets settings persistence, missing-credentials feedback, preserved Calendar
+  UI, no browser credential field, and a clean console in the final smoke.
+
 ## Known Limitations
 
 - real Google Calendar event creation was not tested with external credentials in this session
+- real Google Sheets writes were not tested with external credentials in this session
 - active timer restoration is browser-local, not cross-device
 - `/api/docs` still exists as a developer route from Flask-Smorest, but it is not part of the HR flow
 - no authentication

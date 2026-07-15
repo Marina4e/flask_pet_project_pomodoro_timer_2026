@@ -69,6 +69,30 @@ python run.py
 http://127.0.0.1:5000
 ```
 
+## Конфігурація середовища
+
+Скопіюйте `.env.example` у локальний `.env` і не додавайте `.env` або JSON-ключі
+Google до Git. Застосунок викликає `load_dotenv()` один раз у `create_app()`;
+змінна, уже задана в PowerShell, має пріоритет над значенням із `.env`.
+
+Підтримувані змінні:
+
+- Flask: `FLASK_APP`, `APP_ENV`, `SECRET_KEY`, `DEBUG`, `PORT`
+- SQLite: `DATABASE_URL`
+- таймер: `DEFAULT_TIMEZONE`, `DEFAULT_CYCLES_BEFORE_LONG_BREAK`, `POMODORO_TEST_MODE`
+- Google Calendar: `GOOGLE_CALENDAR_ID`, `GOOGLE_CALENDAR_CREDENTIALS_JSON`,
+  `GOOGLE_CALENDAR_EVENT_PREFIX`, `GOOGLE_CALENDAR_EVENT_COLOR_ID`
+
+`sqlite:///pomodoro.db` перетворюється на абсолютний шлях до
+`instance/pomodoro.db`. Google credentials передаються як JSON в один рядок;
+значення з неекранованими переносами або лапками не буде прочитане `python-dotenv`.
+
+Безпечна перевірка конфігурації без виведення секретів:
+
+```powershell
+python -c "from app import create_app; app=create_app(); keys=['GOOGLE_CALENDAR_ID','GOOGLE_CALENDAR_CREDENTIALS_JSON','POMODORO_TEST_MODE']; print({key: bool(app.config.get(key)) for key in keys})"
+```
+
 ## Що важливо про перший запуск
 
 - локальна SQLite-база створюється автоматично
@@ -96,7 +120,19 @@ python run.py
 
 ```powershell
 Remove-Item Env:POMODORO_TEST_MODE
+python run.py
 ```
+
+Його також можна ввімкнути через `.env`:
+
+```dotenv
+POMODORO_TEST_MODE=true
+```
+
+Якщо значення задане і в PowerShell, і в `.env`, перемагає PowerShell. Кнопка
+короткого preset доступна лише при активному test mode. Завершені test-mode
+сесії зберігаються у `work_sessions` так само, як звичайні; `Reset` не створює
+запис, бо API викликається тільки після завершення countdown.
 
 ## Налаштування таймера
 
@@ -141,6 +177,12 @@ instance/pomodoro.db
 - `user_settings`
 - `alembic_version`
 
+`work_sessions` містить ID сесії, browser-generated `client_session_id`, тип,
+планову й фактичну тривалість, UTC-час початку/завершення, час створення та
+опціональний `google_calendar_event_id`. `user_settings` містить тривалості,
+цикл довгої перерви, звук, auto-start, тему й timezone. Статистика читає
+завершені сесії з `work_sessions` і групує їх за локальною датою обраної timezone.
+
 ### Як швидко перевірити БД
 
 1. Запустіть застосунок через `python run.py`.
@@ -164,6 +206,23 @@ python scripts/check_database.py
 8. Повторно запустіть `python scripts/check_database.py`.
 9. Переконайтеся, що запис не зник.
 
+Перевірка через Flask model:
+
+```powershell
+python -c "from app import create_app; from app.models import WorkSession; app=create_app(); app.app_context().push(); print(WorkSession.query.order_by(WorkSession.id.desc()).limit(10).all())"
+```
+
+Якщо окремий `sqlite3` CLI встановлено, можна також використати:
+
+```text
+sqlite3 instance/pomodoro.db
+.tables
+SELECT * FROM work_sessions ORDER BY id DESC LIMIT 10;
+.quit
+```
+
+На Windows цей CLI необов'язковий; `scripts/check_database.py` достатньо.
+
 ### Як безпечно видалити тестову локальну базу
 
 Спочатку зупиніть сервер, потім:
@@ -183,7 +242,7 @@ Remove-Item .\instance\pomodoro.db
 - зберігає `google_calendar_event_id` у SQLite
 - повторна синхронізація тієї самої останньої сесії блокується
 
-### Змінні `.env`
+### Змінні `.env` для Google Calendar
 
 ```env
 GOOGLE_CALENDAR_ID=
@@ -202,6 +261,11 @@ GOOGLE_CALENDAR_EVENT_COLOR_ID=
 6. Перетворіть JSON у один рядок і вставте в `GOOGLE_CALENDAR_CREDENTIALS_JSON`.
 7. Вставте ID календаря в `GOOGLE_CALENDAR_ID`.
 
+Для цього шляху потрібні `google-api-python-client` і `google-auth`, уже вказані
+в `requirements.txt`. Якщо `import googleapiclient` не працює, достатньо
+точково виконати `pip install google-api-python-client==2.181.0`; `gspread` для
+поточної Calendar integration не використовується.
+
 ### Що реально перевірено
 
 - відсутність credentials повертає зрозумілу помилку
@@ -211,6 +275,108 @@ GOOGLE_CALENDAR_EVENT_COLOR_ID=
 ### Що не перевірялося з реальним Google акаунтом у цій сесії
 
 - створення реальної події у зовнішньому календарі
+
+## Google Sheets
+
+Google Sheets є окремою опціональною інтеграцією і не замінює Google
+Calendar. Кнопка `Sync Completed Sessions` викликає
+`POST /api/integrations/google-sheets/sync` та експортує тільки завершені
+`work`-сесії.
+
+Таблиця отримує дев'ять колонок:
+
+1. `Session ID`
+2. `Date`
+3. `Start Time`
+4. `End Time`
+5. `Planned Duration`
+6. `Actual Duration`
+7. `Mode`
+8. `Timezone`
+9. `Created At`
+
+`Planned Duration` і `Actual Duration` зберігаються в секундах. Стабільний
+`client_session_id` використовується як `Session ID`: перед записом сервіс
+читає першу колонку й пропускає вже наявні ID. Якщо таблиця порожня, перша
+синхронізація створює заголовки. Якщо наявний заголовок не відповідає цьому
+формату, API повертає контрольовану помилку й нічого не дописує.
+
+У браузері зберігаються лише безпечні налаштування `Enable` і `Spreadsheet
+ID`. JSON service account залишається тільки на Flask-сервері.
+
+### Змінні `.env` для Google Sheets
+
+```env
+GOOGLE_SHEETS_ENABLED=false
+GOOGLE_SHEETS_SPREADSHEET_ID=
+GOOGLE_SHEETS_CREDENTIALS_JSON=
+```
+
+Підтримується один формат credentials: повний JSON service account в один
+рядок у `GOOGLE_SHEETS_CREDENTIALS_JSON`. Альтернативні назви змінних або
+шлях до JSON-файлу застосунок не читає.
+
+На PowerShell JSON можна стиснути так:
+
+```powershell
+Get-Content .\service-account.json -Raw |
+  ConvertFrom-Json |
+  ConvertTo-Json -Compress
+```
+
+Вставте результат в одинарних лапках, щоб `python-dotenv` коректно прочитав
+внутрішні подвійні лапки JSON:
+
+```env
+GOOGLE_SHEETS_CREDENTIALS_JSON='{"type":"service_account","...":"..."}'
+```
+
+### Налаштування Google Cloud і таблиці
+
+1. Створіть або виберіть Google Cloud project.
+2. Увімкніть `Google Sheets API` у Google Cloud Console.
+3. Створіть service account і JSON key.
+4. Відкрийте потрібну Google Sheet, натисніть `Share` і додайте `client_email`
+   із JSON-ключа з роллю `Editor`. Domain-wide delegation для однієї
+   конкретної таблиці не потрібен.
+5. Скопіюйте ID між `/d/` і `/edit` у URL таблиці.
+6. Перетворіть JSON key в один рядок, вставте його в
+   `GOOGLE_SHEETS_CREDENTIALS_JSON`, додайте ID і встановіть
+   `GOOGLE_SHEETS_ENABLED=true`.
+7. Запустіть `flask --app run.py db upgrade`, потім `python run.py`.
+8. На головній сторінці відкрийте `Google Sheets Settings`, збережіть ID і
+   натисніть `Sync Completed Sessions`.
+
+Офіційні інструкції Google: [увімкнення Sheets API та Python
+клієнт](https://developers.google.com/workspace/sheets/api/quickstart/python),
+[створення service account, JSON key і прямий доступ до конкретного
+файлу](https://developers.google.com/workspace/guides/create-credentials).
+
+Не комітьте `.env`, JSON key або його `private_key`. Для коду достатньо вже
+наявних `google-api-python-client` і `google-auth`; `gspread` та
+`oauth2client` не використовуються.
+
+### Чи підходить безкоштовний доступ для portfolio demo
+
+Станом на 15 липня 2026 року стандартне використання Google Sheets API не має
+додаткової оплати в межах квот. Google вказує 300 read і 300 write requests за
+хвилину на project та 60 за хвилину на користувача в project; ручний експорт
+portfolio demo суттєво нижчий за ці межі. Водночас Google уже попереджає, що
+перевищення квот планують зробити платним пізніше у 2026 році, тому перед
+публічним production-запуском варто повторно перевірити [актуальні квоти й
+pricing](https://developers.google.com/workspace/sheets/api/limits).
+
+### Що перевірено без реального Google акаунта
+
+- disabled integration, відсутні ID/credentials та некоректний JSON
+- mocked successful export із правильними колонками
+- пропуск повторних `Session ID`
+- експорт лише завершених `work`-сесій
+- безпечна зовнішня помилка без сирого тексту Google API
+- збереження `Enable` і `Spreadsheet ID` через frontend settings
+
+Реальний запис у зовнішню Google Sheet потребує власного service account і не
+виконувався в цій сесії.
 
 ## Команди для перевірки
 
@@ -222,6 +388,32 @@ flask --app run.py routes
 pytest -v
 python scripts/check_database.py
 ```
+
+## Docker
+
+Docker необов'язковий для локальної перевірки: найпростіший запуск —
+`python run.py`. Він корисний для повторюваного Linux-оточення й перевірки
+Gunicorn. Усі команди запускаються з кореня проєкту:
+
+```powershell
+docker build -t pomodoro-work-tracker .
+docker run --rm -p 5000:5000 --env-file .env -e APP_ENV=production pomodoro-work-tracker
+```
+
+Щоб SQLite не зникла разом із контейнером, змонтуйте `instance/` у `/app/instance`:
+
+```powershell
+docker run --rm `
+  -p 5000:5000 `
+  --env-file .env `
+  -e APP_ENV=production `
+  -v "${PWD}\instance:/app/instance" `
+  pomodoro-work-tracker
+```
+
+`WORKDIR` у Dockerfile — `/app`, порт — `5000`, а `start.sh` застосовує міграції
+й запускає Gunicorn. Без volume файл `/app/instance/pomodoro.db` живе лише у
+filesystem контейнера.
 
 ## Як працює Flask-проєкт
 
@@ -352,20 +544,23 @@ flask_pet_project_pomodoro_timer_2026/
 
 ## Що реально перевірено в цій сесії
 
-- `pytest tests/test_pages.py tests/test_statistics_api.py -v`
-- `python -m compileall app`
+- focused backend suite — `31 passed`
+- повний `pytest -v` — `48 passed`
+- `python -m compileall app scripts run.py`
 - `ruff check .`
 - `black --check .`
-- `pytest -v` — `45 passed`
-- live HTTP-запити:
-  - `/` повернув `200`
-  - `/api/statistics/month?timezone=Europe/Kyiv` повернув `200`
-  - `/api/statistics/week?timezone=Europe/Kyiv` повернув `200`
-  - `/api/statistics/chart?timezone=Europe/Kyiv` повернув `200`
-  - `/api/statistics/month?timezone=UTC` повернув `200`
-  - усі три `/api/statistics/*?timezone=Invalid/Timezone` повернули `400`
-- browser smoke у цьому проході не завершено: Windows browser-control не зміг
-  безпечно визначити поточний URL відкритого Chrome-вікна.
+- `flask --app run.py routes`
+- `python scripts/check_database.py` — знайдено `29` локальних сесій
+- `googleapiclient` і `google.auth` імпортуються, `pip check` не знаходить конфліктів
+- live HTTP smoke:
+  - `/` і `/api/health` повертають `200`
+  - `/api/integrations/google-calendar/status` контрольовано повідомляє про
+    відсутні Calendar ID і credentials
+  - sync без credentials повертає `400 validation_error`, а не падіння застосунку
+- browser smoke підтвердив завантаження `clock-face.gif`, показ анімації лише
+  під час Running і відсутність console errors
+- Dockerfile прочитано й команди звірено; image build не запускався, бо локальний
+  Docker Desktop/daemon був зупинений
 
 ## Відомі обмеження
 

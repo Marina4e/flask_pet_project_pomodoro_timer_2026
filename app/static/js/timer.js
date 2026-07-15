@@ -166,7 +166,22 @@
 
   function updateRunnerState(status) {
     elements.runners.forEach((runner) => {
-      runner.dataset.runner = status === "running" ? "running" : "idle";
+      const animatedAsset = runner.querySelector(".clock-asset-running");
+      runner.dataset.runner = status;
+
+      if (!animatedAsset) {
+        return;
+      }
+
+      if (status === "running") {
+        const animatedSrc = animatedAsset.dataset.animatedSrc;
+        if (animatedSrc && !animatedAsset.getAttribute("src")) {
+          animatedAsset.setAttribute("src", animatedSrc);
+        }
+        return;
+      }
+
+      animatedAsset.removeAttribute("src");
     });
   }
 

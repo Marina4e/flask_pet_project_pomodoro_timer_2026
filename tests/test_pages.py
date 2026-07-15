@@ -28,8 +28,17 @@ def test_home_page_contains_expected_ui(client):
     assert 'id="export-control"' in html
     assert 'id="google-calendar-card"' in html
     assert 'href="/#google-calendar-card"' in html
+    assert 'id="google-sheets-card"' in html
+    assert "Google Sheets Settings" in html
+    assert 'id="google-sheets-enabled-input"' in html
+    assert 'id="google-sheets-spreadsheet-id-input"' in html
+    assert "GOOGLE_SHEETS_CREDENTIALS_JSON" not in html
     assert 'lang="en"' in html
-    assert "images/tomato-idle.png" in html
+    assert "images/tomato-idle-transparent.png" in html
+    timer_runner = html.split('id="timer-tomato-runner"', 1)[1].split("</div>", 1)[0]
+    assert "images/tomato-idle.png" not in timer_runner
+    assert "images/clock-face-static.png" in timer_runner
+    assert "images/clock-face.gif" in timer_runner
     assert "Used for daily, weekly, and monthly statistics." in html
 
 

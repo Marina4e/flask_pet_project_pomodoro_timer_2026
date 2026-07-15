@@ -16,6 +16,8 @@ class UserSettings(db.Model):
     auto_start_next_session = db.Column(db.Boolean, nullable=False, default=True)
     theme = db.Column(db.String(16), nullable=False, default="system")
     timezone = db.Column(db.String(64), nullable=False)
+    google_sheets_enabled = db.Column(db.Boolean, nullable=True)
+    google_sheets_spreadsheet_id = db.Column(db.String(255), nullable=True)
     updated_at_utc = db.Column(
         db.DateTime, nullable=False, default=utc_now, onupdate=utc_now
     )

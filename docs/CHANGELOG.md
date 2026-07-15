@@ -98,6 +98,36 @@
 - `pytest -v`
 - `flask --app run.py routes`
 - fresh SQLite startup smoke with a clean temporary database
+
+## 2026-07-15 — Google Sheets and clock animation
+
+### Added
+
+- Dedicated Google Sheets service, schema, blueprint, settings endpoints, sync
+  endpoint, environment variables, and Alembic migration.
+- Compact `Google Sheets Settings` accordion with safe SQLite persistence for
+  enablement and Spreadsheet ID.
+- Mocked tests for disabled/missing/invalid configuration, successful export,
+  duplicate prevention, work-only filtering, external error sanitization, and
+  settings persistence.
+- Generated 3D clock assets: a static PNG and an optimized 48-frame GIF with a
+  slow 24-second loop.
+
+### Changed
+
+- Timer animation now loads the GIF only while running or resumed and returns
+  to the static clock for ready, paused, completed, and reset states.
+- Renamed the stale frontend `syncSheets()` Calendar handler to
+  `syncCalendar()` and kept Google Calendar behavior unchanged.
+- README now documents secure service-account setup, direct Sheet sharing,
+  exported columns, duplicate rules, quotas, and current pricing caveat.
+
+### Verified
+
+- focused frontend and Sheets suite — `17 passed`
+- full pytest suite — `61 passed`
+- live temporary-SQLite browser smoke for clock and Sheets settings flows
+- Google Calendar card remained present and the final browser console was clean
 - `python scripts/check_database.py`
 - browser smoke for timer controls and calendar navigation via Playwright
 
