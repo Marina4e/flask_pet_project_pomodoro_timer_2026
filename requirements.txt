@@ -1,0 +1,14 @@
+Flask==3.1.1
+Flask-Migrate==4.1.0
+Flask-SQLAlchemy==3.1.1
+flask-smorest==0.46.1
+google-api-python-client==2.181.0
+google-auth==2.40.3
+marshmallow==3.26.1
+python-dotenv==1.1.1
+tzdata>=2024.1
+gunicorn==23.0.0
+pytest==8.4.1
+pytest-cov==6.2.1
+ruff==0.12.4
+black==25.1.0

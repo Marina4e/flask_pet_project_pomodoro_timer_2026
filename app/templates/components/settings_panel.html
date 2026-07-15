@@ -1,0 +1,98 @@
+<article class="card settings-card" id="settings-panel">
+  <div class="card-heading">
+    <div>
+      <p class="eyebrow">Settings</p>
+      <h2>Timer Settings</h2>
+    </div>
+  </div>
+
+  <form id="settings-form" class="settings-form">
+    <div class="settings-primary-grid">
+      <div class="setting-field">
+        <label for="work-duration-input">Work duration</label>
+        <select class="form-select" id="work-duration-input" name="work_duration_minutes" required>
+          <option value="15">15</option>
+          <option value="25">25</option>
+          <option value="30">30</option>
+          <option value="45">45</option>
+          <option value="60">60</option>
+        </select>
+      </div>
+      <div class="setting-field">
+        <label for="short-break-input">Short break</label>
+        <select class="form-select" id="short-break-input" name="short_break_minutes" required>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+        </select>
+      </div>
+      <div class="setting-field">
+        <label for="long-break-input">Long break</label>
+        <select class="form-select" id="long-break-input" name="long_break_minutes" required>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+        </select>
+      </div>
+      <div class="setting-field timezone-field">
+        <label for="timezone-input">Timezone</label>
+        <input
+          class="form-control"
+          id="timezone-input"
+          name="timezone"
+          type="text"
+          value="{{ default_timezone }}"
+          placeholder="Europe/Kyiv"
+          aria-describedby="timezone-help timezone-error"
+          required
+        >
+        <small class="helper-text" id="timezone-help">Used for daily, weekly, and monthly statistics. Enter an IANA timezone such as Europe/Kyiv.</small>
+        <small class="helper-text">Active timezone: <output id="timezone-current-value">{{ default_timezone }}</output></small>
+        <p class="field-error hidden" id="timezone-error" role="alert"></p>
+      </div>
+    </div>
+
+    <div class="accordion settings-advanced" id="advanced-settings-accordion">
+      <div class="accordion-item">
+        <h3 class="accordion-header" id="advanced-settings-heading">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#advanced-settings-panel" aria-expanded="false" aria-controls="advanced-settings-panel">
+            Advanced Settings
+          </button>
+        </h3>
+        <div id="advanced-settings-panel" class="accordion-collapse collapse" aria-labelledby="advanced-settings-heading">
+          <div class="accordion-body">
+            <div class="form-grid">
+              <div class="setting-field">
+                <label for="cycles-before-long-break-input">Long break every N work sessions</label>
+                <input class="form-control" id="cycles-before-long-break-input" name="cycles_before_long_break" type="number" min="2" max="12" required>
+              </div>
+              <div class="setting-field">
+                <label for="theme-select">Theme</label>
+                <select class="form-select" id="theme-select" name="theme" required>
+                  <option value="system">System</option>
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </div>
+              <label class="checkbox-label" for="sound-enabled-input">
+                <input id="sound-enabled-input" name="sound_enabled" type="checkbox">
+                Enable completion sound
+              </label>
+              <label class="checkbox-label" for="auto-start-next-session-input">
+                <input id="auto-start-next-session-input" name="auto_start_next_session" type="checkbox">
+                Start the next session automatically
+              </label>
+            </div>
+            <p class="helper-text settings-footnote">
+              Test mode uses 10-second work sessions and 5-second breaks when enabled by <code>POMODORO_TEST_MODE=true</code>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="settings-actions">
+      <button class="btn button button-primary" type="submit">Save Settings</button>
+      <p class="helper-text" id="settings-message" role="status">Settings are stored locally and used by the timer and statistics.</p>
+    </div>
+  </form>
+</article>

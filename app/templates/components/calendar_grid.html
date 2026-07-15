@@ -1,0 +1,51 @@
+<section class="calendar-layout" id="calendar-app">
+  <article class="card calendar-card">
+    <div class="card-heading calendar-toolbar">
+      <div>
+        <p class="eyebrow">Calendar</p>
+        <h2 id="calendar-month-label">-</h2>
+      </div>
+      <div class="toolbar-actions">
+        <button class="btn button button-ghost" id="calendar-prev-button" type="button">Previous</button>
+        <button class="btn button button-ghost" id="calendar-next-button" type="button">Next</button>
+      </div>
+    </div>
+    <p class="helper-text" id="calendar-timezone-note">Timezone: {{ default_timezone }}</p>
+    <div class="calendar-weekdays" aria-hidden="true">
+      <span>Mon</span>
+      <span>Tue</span>
+      <span>Wed</span>
+      <span>Thu</span>
+      <span>Fri</span>
+      <span>Sat</span>
+      <span>Sun</span>
+    </div>
+    <div class="calendar-grid" id="calendar-grid" aria-label="Activity calendar"></div>
+  </article>
+
+  <article class="card day-details-card">
+    <div class="card-heading">
+      <div>
+        <p class="eyebrow">Day Details</p>
+        <h2 id="selected-date-label">Select a date</h2>
+      </div>
+    </div>
+    <dl class="metric-list compact-metrics">
+      <div>
+        <dt>Focus minutes</dt>
+        <dd id="selected-day-focus">0</dd>
+      </div>
+      <div>
+        <dt>Work sessions</dt>
+        <dd id="selected-day-work">0</dd>
+      </div>
+      <div>
+        <dt>All sessions</dt>
+        <dd id="selected-day-total">0</dd>
+      </div>
+    </dl>
+    <ul class="session-list" id="day-session-list">
+      <li class="muted-text">Select a date to see completed sessions.</li>
+    </ul>
+  </article>
+</section>

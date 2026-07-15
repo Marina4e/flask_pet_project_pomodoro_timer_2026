@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="hero-card compact-hero">
+    <div>
+      <p class="eyebrow">Activity Calendar</p>
+      <h1>Activity Calendar</h1>
+      <p class="hero-text">
+        Select a day to review completed sessions, focus time, and completed
+        Pomodoros.
+      </p>
+    </div>
+  </section>
+
+  {% include "components/calendar_grid.html" %}
+{% endblock %}

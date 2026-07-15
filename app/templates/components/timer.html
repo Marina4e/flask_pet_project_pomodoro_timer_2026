@@ -1,0 +1,65 @@
+<article class="card timer-card" id="timer-widget">
+  <div class="card-heading">
+    <div>
+      <p class="eyebrow">Timer</p>
+      <h2>Pomodoro Timer</h2>
+    </div>
+    <span class="status-pill" id="timer-status-pill">Idle</span>
+  </div>
+
+  <div class="timer-hero">
+    <div class="tomato-stage timer-stage" aria-hidden="true">
+      {% set runner_id = "timer-tomato-runner" %}
+      {% set runner_classes = "timer-runner" %}
+      {% include "components/tomato_runner.html" %}
+    </div>
+    <div class="timer-hero-copy">
+      <p class="helper-text timer-helper-compact">
+        Press <strong>Start</strong> to begin a focus interval. The completed
+        session is saved automatically through the Flask API.
+      </p>
+      <div class="timer-meta-chips">
+        <span class="timer-meta-text" id="timer-cycle-note">Session #1</span>
+        <span class="timer-meta-text" id="timer-next-mode-note">Next: short break</span>
+        <span class="inline-note hidden" id="test-mode-badge">Test mode active</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="preset-switch" role="group" aria-label="Timer presets">
+    <button class="btn preset-button is-active" id="preset-standard-button" type="button" data-preset="standard">
+      Standard 25/5
+    </button>
+    <button class="btn preset-button" id="preset-demo-button" type="button" data-preset="demo">
+      Test mode 10s / 5s
+    </button>
+  </div>
+
+  <div class="mode-switch" role="group" aria-label="Timer modes">
+    <button class="btn mode-button is-active" type="button" data-mode="work">Work</button>
+    <button class="btn mode-button" type="button" data-mode="short_break">Short break</button>
+    <button class="btn mode-button" type="button" data-mode="long_break">Long break</button>
+  </div>
+
+  <p class="timer-duration-label">
+    Current duration:
+    <strong id="timer-duration-label">25 min</strong>
+  </p>
+
+  <div class="timer-display" id="timer-display" aria-live="polite">25:00</div>
+  <div class="progress-shell" aria-hidden="true">
+    <div class="progress-bar" id="timer-progress-bar"></div>
+  </div>
+
+  <p class="helper-text" id="timer-message">
+    The timer saves the completed session automatically through Flask API.
+  </p>
+
+  <div class="timer-actions">
+    <button class="btn button button-primary" id="start-timer-button" type="button">Start</button>
+    <button class="btn button button-warning" id="pause-timer-button" type="button">Pause</button>
+    <button class="btn button button-secondary" id="resume-timer-button" type="button">Resume</button>
+    <button class="btn button button-ghost" id="reset-timer-button" type="button">Reset</button>
+    <a class="btn button button-ghost" href="/api/export/sessions.csv" id="export-control">Export CSV</a>
+  </div>
+</article>

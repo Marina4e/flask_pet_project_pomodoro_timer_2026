@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="hero-card compact-hero">
+    <div>
+      <p class="eyebrow">500</p>
+      <h1>Server error</h1>
+      <p class="hero-text">
+        The production traceback is hidden. Check the logs and try the request
+        again.
+      </p>
+      <a class="btn button button-primary" href="{{ url_for('pages.index') }}">Back to Home</a>
+    </div>
+  </section>
+{% endblock %}

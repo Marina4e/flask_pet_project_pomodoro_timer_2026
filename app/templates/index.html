@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="carousel-shell glass-panel">
+    <div
+      id="pomodoroPagesCarousel"
+      class="carousel slide"
+      data-bs-ride="carousel"
+      aria-label="Pomodoro Work Tracker sections"
+    >
+      <div class="carousel-indicators">
+        <button
+          type="button"
+          data-bs-target="#pomodoroPagesCarousel"
+          data-bs-slide-to="0"
+          class="active"
+          aria-current="true"
+          aria-label="Pomodoro Timer"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#pomodoroPagesCarousel"
+          data-bs-slide-to="1"
+          aria-label="Statistics"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#pomodoroPagesCarousel"
+          data-bs-slide-to="2"
+          aria-label="Calendar"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#pomodoroPagesCarousel"
+          data-bs-slide-to="3"
+          aria-label="Settings"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#pomodoroPagesCarousel"
+          data-bs-slide-to="4"
+          aria-label="Google Calendar"
+        ></button>
+      </div>
+      <div class="carousel-inner">
+        <div class="carousel-item active carousel-page-item carousel-page-item-timer">
+          <div class="carousel-page-overlay"></div>
+          <div class="container carousel-page-container">
+            <div class="row align-items-center g-4 w-100">
+              <div class="col-md-5 order-1 order-md-1 text-center">
+                <img
+                  class="img-fluid carousel-page-image"
+                  src="{{ url_for('static', filename='images/tomato-idle-transparent.png') }}"
+                  alt="Pomodoro tomato timer"
+                  decoding="async"
+                >
+              </div>
+              <div class="col-md-7 order-2 order-md-2">
+                <div class="carousel-caption text-center carousel-page-caption">
+                  <p class="eyebrow">Dashboard section</p>
+                  <h1>Pomodoro Timer</h1>
+                  <p class="hero-text hero-text-wide mx-auto">
+                    Start focused work intervals, pause when needed, and save
+                    completed sessions to SQLite.
+                  </p>
+                  <p>
+                    <a
+                      class="btn button button-primary carousel-page-button"
+                      id="carousel-open-timer"
+                      href="{{ url_for('pages.index') }}#timer-widget"
+                    >
+                      Open Timer
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item carousel-page-item carousel-page-item-statistics">
+          <div class="carousel-page-overlay"></div>
+          <div class="container carousel-page-container">
+            <div class="row align-items-center g-4 w-100">
+              <div class="col-md-5 order-1 order-md-1 text-center">
+                <img
+                  class="img-fluid carousel-page-image"
+                  src="{{ url_for('static', filename='images/tomato-idle-transparent.png') }}"
+                  alt="Pomodoro tomato timer"
+                  loading="lazy"
+                  decoding="async"
+                >
+              </div>
+              <div class="col-md-7 order-2 order-md-2">
+                <div class="carousel-caption text-center carousel-page-caption">
+                  <p class="eyebrow">Page /statistics</p>
+                  <h2 class="slide-title">Productivity Statistics</h2>
+                  <p class="hero-text hero-text-wide mx-auto">
+                    Review focus time and completed Pomodoros for today, this
+                    week, and this month, plus a seven-day activity chart.
+                  </p>
+                  <p>
+                    <a
+                      class="btn button button-primary carousel-page-button"
+                      id="carousel-open-statistics"
+                      href="{{ url_for('pages.statistics_page') }}"
+                    >
+                      View Statistics
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item carousel-page-item carousel-page-item-calendar">
+          <div class="carousel-page-overlay"></div>
+          <div class="container carousel-page-container">
+            <div class="row align-items-center g-4 w-100">
+              <div class="col-md-5 order-1 order-md-1 text-center">
+                <img
+                  class="img-fluid carousel-page-image"
+                  src="{{ url_for('static', filename='images/tomato-idle-transparent.png') }}"
+                  alt="Pomodoro tomato timer"
+                  loading="lazy"
+                  decoding="async"
+                >
+              </div>
+              <div class="col-md-7 order-2 order-md-2">
+                <div class="carousel-caption text-center carousel-page-caption">
+                  <p class="eyebrow">Page /calendar</p>
+                  <h2 class="slide-title">Activity Calendar</h2>
+                  <p class="hero-text hero-text-wide mx-auto">
+                    Browse completed sessions for a selected day in a compact
+                    monthly activity calendar.
+                  </p>
+                  <p>
+                    <a
+                      class="btn button button-primary carousel-page-button"
+                      id="carousel-open-calendar"
+                      href="{{ url_for('pages.calendar_page') }}"
+                    >
+                      Open Calendar
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item carousel-page-item carousel-page-item-settings">
+          <div class="carousel-page-overlay"></div>
+          <div class="container carousel-page-container">
+            <div class="row align-items-center g-4 w-100">
+              <div class="col-md-5 order-1 order-md-1 text-center">
+                <img
+                  class="img-fluid carousel-page-image"
+                  src="{{ url_for('static', filename='images/tomato-idle-transparent.png') }}"
+                  alt="Pomodoro tomato timer"
+                  loading="lazy"
+                  decoding="async"
+                >
+              </div>
+              <div class="col-md-7 order-2 order-md-2">
+                <div class="carousel-caption text-center carousel-page-caption">
+                  <p class="eyebrow">Dashboard section</p>
+                  <h2 class="slide-title">Timer Settings</h2>
+                  <p class="hero-text hero-text-wide mx-auto">
+                    Choose work and break durations, theme, sound, and the
+                    timezone used by productivity statistics.
+                  </p>
+                  <p>
+                    <a
+                      class="btn button button-primary carousel-page-button"
+                      id="carousel-open-settings"
+                      href="{{ url_for('pages.index') }}#settings-panel"
+                    >
+                      Open Settings
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item carousel-page-item carousel-page-item-sync">
+          <div class="carousel-page-overlay"></div>
+          <div class="container carousel-page-container">
+            <div class="row align-items-center g-4 w-100">
+              <div class="col-md-5 order-1 order-md-1 text-center">
+                <img
+                  class="img-fluid carousel-page-image"
+                  src="{{ url_for('static', filename='images/tomato-idle-transparent.png') }}"
+                  alt="Pomodoro tomato timer"
+                  loading="lazy"
+                  decoding="async"
+                >
+              </div>
+              <div class="col-md-7 order-2 order-md-2">
+                <div class="carousel-caption text-center carousel-page-caption">
+                  <p class="eyebrow">Dashboard section</p>
+                  <h2 class="slide-title">Google Calendar Sync</h2>
+                  <p class="hero-text hero-text-wide mx-auto">
+                    Add the latest completed work session to Google Calendar
+                    when credentials are configured in `.env`.
+                  </p>
+                  <p>
+                    <a
+                      class="btn button button-primary carousel-page-button"
+                      id="carousel-open-google-calendar"
+                      href="{{ url_for('pages.index') }}#google-calendar-card"
+                    >
+                      Calendar Sync
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#pomodoroPagesCarousel"
+        data-bs-slide="prev"
+      >
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#pomodoroPagesCarousel"
+        data-bs-slide="next"
+      >
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="dashboard-grid single-column">
+    {% include "components/timer.html" %}
+  </section>
+
+  <section class="dashboard-grid single-column" id="hours-overview">
+    {% include "components/stats_cards.html" %}
+    <article class="card chart-card">
+      <div class="card-heading chart-heading">
+        <div>
+          <p class="eyebrow">Seven-Day Productivity</p>
+          <h2>Productivity trend</h2>
+        </div>
+        <div class="chart-heading-actions">
+          <span class="inline-note" id="chart-timezone-note">{{ default_timezone }}</span>
+          <button
+            class="btn button button-ghost chart-toggle"
+            id="productivity-chart-toggle"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#productivity-chart-collapse"
+            aria-expanded="false"
+            aria-controls="productivity-chart-collapse"
+          >
+            Show chart
+          </button>
+        </div>
+      </div>
+      <div class="collapse" id="productivity-chart-collapse">
+        <div class="chart-content">
+          <canvas id="productivity-chart" aria-label="Productivity for the last seven days"></canvas>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="dashboard-grid single-column">
+    {% include "components/settings_panel.html" %}
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="card info-card google-calendar-card" id="google-calendar-card">
+      <div class="card-heading">
+        <div>
+          <p class="eyebrow">Google Calendar</p>
+          <h2>Sync latest work session</h2>
+        </div>
+        <span class="status-pill" id="google-calendar-status-pill">Checking</span>
+      </div>
+      <p class="helper-text" id="google-calendar-status-message">
+        Checking whether Google Calendar credentials and calendar ID are configured.
+      </p>
+      <div class="sync-summary" id="google-calendar-summary">
+        <div>
+          <span class="sync-label">Calendar ID</span>
+          <strong id="google-calendar-id-label">Not configured</strong>
+        </div>
+        <div>
+          <span class="sync-label">Latest work session</span>
+          <strong id="google-calendar-session-label">-</strong>
+        </div>
+      </div>
+      <button class="btn button button-primary hidden" id="google-calendar-sync-button" type="button">
+        Sync to Google Calendar
+      </button>
+      <p class="helper-text">
+        The button creates one Google Calendar event for the latest completed work session
+        after `.env` is configured.
+      </p>
+    </article>
+
+    <article class="card info-card">
+      <div class="card-heading">
+        <div>
+          <p class="eyebrow">How it works</p>
+          <h2>Timer logic</h2>
+        </div>
+      </div>
+      <ul class="feature-list">
+        <li>The active timer is stored in `localStorage`, so a page reload does not destroy the current session.</li>
+        <li>Completed work, short break, and long break sessions are saved through Flask API into the database.</li>
+        <li>Daily, weekly, and monthly hours are calculated from stored database sessions.</li>
+        <li>Settings control durations, auto-start for the next session, and the long-break interval.</li>
+      </ul>
+    </article>
+  </section>
+{% endblock %}

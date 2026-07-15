@@ -1,0 +1,223 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - paragraph [ref=e6]: Flask Portfolio Project
+        - link "Pomodoro Work Tracker" [ref=e7] [cursor=pointer]:
+          - /url: /
+      - navigation "Основна навігація" [ref=e8]:
+        - generic [ref=e9]:
+          - link "Головна" [ref=e10] [cursor=pointer]:
+            - /url: /
+          - link "Статистика" [ref=e11] [cursor=pointer]:
+            - /url: /statistics
+          - link "Календар" [ref=e12] [cursor=pointer]:
+            - /url: /calendar
+  - main [ref=e13]:
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - button "Слайд 1" [ref=e17] [cursor=pointer]
+        - button "Слайд 2" [ref=e18] [cursor=pointer]
+        - button "Слайд 3" [ref=e19] [cursor=pointer]
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - paragraph [ref=e24]: Bootstrap Carousel + Flask Timer
+          - heading "Pomodoro Work Tracker for daily focus sessions" [level=1] [ref=e25]
+          - paragraph [ref=e26]: A small Flask project with a browser timer, SQLite-backed statistics, activity calendar, CSV export, and a simple Google Calendar sync button.
+          - generic [ref=e27]:
+            - generic [ref=e28]: Start / Pause / Resume / Reset
+            - generic [ref=e29]: Optional test mode 10s / 5s
+            - generic [ref=e30]: Google Calendar sync
+        - generic [ref=e32]:
+          - generic [ref=e34]: Idle / Pause
+          - generic [ref=e35]: Bounce = running
+    - generic [ref=e36]:
+      - article [ref=e38]:
+        - paragraph [ref=e40]: Section one
+        - heading "Timer of the day" [level=2] [ref=e41]
+        - paragraph [ref=e42]: A large timer, a stable tomato while waiting, and a bounce loop while the timer is running.
+      - article [ref=e44]:
+        - paragraph [ref=e46]: Section two
+        - heading "Hours this week" [level=2] [ref=e47]
+        - paragraph [ref=e48]: Pulled from saved database sessions and refreshed right after each completed Pomodoro.
+      - article [ref=e50]:
+        - paragraph [ref=e52]: Section three
+        - heading "Hours this month" [level=2] [ref=e53]
+        - paragraph [ref=e54]: Shows the bigger monthly workload so progress does not get lost between isolated timer runs.
+    - generic [ref=e55]:
+      - article [ref=e56]:
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - paragraph [ref=e59]: Timer
+            - heading "Pomodoro таймер дня" [level=2] [ref=e60]
+          - generic [ref=e61]: Ready
+        - generic [ref=e65]:
+          - paragraph [ref=e66]:
+            - text: Press
+            - strong [ref=e67]: Start
+            - text: and the tomato switches into the bounce loop. If the tomato is moving, the timer is actively running.
+          - generic [ref=e68]:
+            - generic [ref=e69]: "Session #1"
+            - generic [ref=e70]: "Далі: short break"
+            - generic [ref=e71]: Test mode active
+        - group "Готові пресети таймера" [ref=e72]:
+          - button "Standard 25/5" [ref=e73] [cursor=pointer]
+          - button "Test mode 10с / 5с" [ref=e74] [cursor=pointer]
+        - group "Режими таймера" [ref=e75]:
+          - button "Work" [ref=e76] [cursor=pointer]
+          - button "Short break" [ref=e77] [cursor=pointer]
+          - button "Long break" [ref=e78] [cursor=pointer]
+        - paragraph [ref=e79]:
+          - text: "Current duration:"
+          - strong [ref=e80]: 25 хв
+        - generic [ref=e81]: 25:00
+        - paragraph [ref=e83]: The timer saves the completed session automatically through Flask API.
+        - generic [ref=e84]:
+          - button "Start" [ref=e85] [cursor=pointer]
+          - button "Pause" [disabled] [ref=e86]
+          - button "Resume" [disabled] [ref=e87]
+          - button "Reset" [disabled] [ref=e88]
+          - link "Export CSV" [ref=e89] [cursor=pointer]:
+            - /url: /api/export/sessions.csv
+      - article [ref=e90]:
+        - generic [ref=e92]:
+          - paragraph [ref=e93]: Settings
+          - heading "Налаштування таймера" [level=2] [ref=e94]
+        - generic [ref=e95]:
+          - generic [ref=e96]:
+            - generic [ref=e97]:
+              - text: Work duration (minutes)
+              - combobox "Work duration (minutes)" [ref=e98]:
+                - option "15"
+                - option "25" [selected]
+                - option "30"
+                - option "45"
+                - option "60"
+            - generic [ref=e99]:
+              - text: Short break (minutes)
+              - combobox "Short break (minutes)" [ref=e100]:
+                - option "5" [selected]
+                - option "10"
+                - option "15"
+            - generic [ref=e101]:
+              - text: Long break (minutes)
+              - combobox "Long break (minutes)" [ref=e102]:
+                - option "5"
+                - option "10"
+                - option "15" [selected]
+            - generic [ref=e103]:
+              - text: Long break every N work sessions
+              - spinbutton "Long break every N work sessions" [ref=e104]: "4"
+            - generic [ref=e105]:
+              - text: Theme
+              - combobox "Theme" [ref=e106]:
+                - option "System" [selected]
+                - option "Light"
+                - option "Dark"
+            - generic [ref=e107]:
+              - text: Time zone
+              - textbox "Time zone" [ref=e108]: Europe/Kyiv
+            - generic [ref=e109]:
+              - checkbox "Увімкнути звукове сповіщення" [checked] [ref=e110]
+              - text: Увімкнути звукове сповіщення
+            - generic [ref=e111]:
+              - checkbox "Автоматично запускати наступну сесію після завершення поточної" [checked] [ref=e112]
+              - text: Автоматично запускати наступну сесію після завершення поточної
+          - generic [ref=e113]:
+            - button "Зберегти налаштування" [ref=e114] [cursor=pointer]
+            - paragraph [ref=e115]: Тут зберігаються тривалості, автоцикл, long break interval, тема й часова зона.
+          - paragraph [ref=e116]: "Кнопка `Test mode 10с / 5с` показується тільки коли `POMODORO_TEST_MODE=true`."
+    - generic [ref=e117]:
+      - region "Картки статистики" [ref=e118]:
+        - article [ref=e119]:
+          - generic [ref=e120]:
+            - generic [ref=e121]:
+              - generic [ref=e122]:
+                - paragraph [ref=e123]: Today
+                - heading "Часы за день" [level=2] [ref=e124]
+              - generic [ref=e125]: "-"
+            - paragraph [ref=e126]: 0.00 ч
+            - paragraph [ref=e127]: Фокус-час за сьогодні з бази даних
+            - generic [ref=e128]:
+              - generic [ref=e129]:
+                - term [ref=e130]: Focus minutes
+                - definition [ref=e131]: "0"
+              - generic [ref=e132]:
+                - term [ref=e133]: Work sessions
+                - definition [ref=e134]: "0"
+              - generic [ref=e135]:
+                - term [ref=e136]: Tracked total
+                - definition [ref=e137]: "0"
+        - article [ref=e138]:
+          - generic [ref=e139]:
+            - generic [ref=e140]:
+              - generic [ref=e141]:
+                - paragraph [ref=e142]: Week
+                - heading "Часы за неделю" [level=2] [ref=e143]
+              - generic [ref=e144]: "-"
+            - paragraph [ref=e145]: 0.00 ч
+            - paragraph [ref=e146]: Сумма завершённых work-сессий за тиждень
+            - generic [ref=e147]:
+              - generic [ref=e148]:
+                - term [ref=e149]: Focus minutes
+                - definition [ref=e150]: "0"
+              - generic [ref=e151]:
+                - term [ref=e152]: Work sessions
+                - definition [ref=e153]: "0"
+              - generic [ref=e154]:
+                - term [ref=e155]: Tracked total
+                - definition [ref=e156]: "0"
+        - article [ref=e157]:
+          - generic [ref=e158]:
+            - generic [ref=e159]:
+              - generic [ref=e160]:
+                - paragraph [ref=e161]: Month
+                - heading "Часы за месяц" [level=2] [ref=e162]
+              - generic [ref=e163]: "-"
+            - paragraph [ref=e164]: 0.00 ч
+            - paragraph [ref=e165]: Видно весь накопленный темп за текущий месяц
+            - generic [ref=e166]:
+              - generic [ref=e167]:
+                - term [ref=e168]: Focus minutes
+                - definition [ref=e169]: "0"
+              - generic [ref=e170]:
+                - term [ref=e171]: Work sessions
+                - definition [ref=e172]: "0"
+              - generic [ref=e173]:
+                - term [ref=e174]: Tracked total
+                - definition [ref=e175]: "0"
+      - article [ref=e176]:
+        - generic [ref=e177]:
+          - generic [ref=e178]:
+            - paragraph [ref=e179]: 7-day chart
+            - heading "Графік продуктивності за 7 днів" [level=2] [ref=e180]
+          - generic [ref=e181]: Europe/Kyiv
+        - generic "Графік продуктивності за сім днів" [ref=e182]
+    - generic [ref=e183]:
+      - article [ref=e184]:
+        - generic [ref=e185]:
+          - generic [ref=e186]:
+            - paragraph [ref=e187]: Google Calendar
+            - heading "Sync latest work session" [level=2] [ref=e188]
+          - generic [ref=e189]: Setup
+        - paragraph [ref=e190]: "Add calendar ID and service-account credentials to `.env` to enable sync."
+        - generic [ref=e191]:
+          - generic [ref=e192]:
+            - generic [ref=e193]: Calendar ID
+            - strong [ref=e194]: Not configured
+          - generic [ref=e195]:
+            - generic [ref=e196]: Latest work session
+            - strong [ref=e197]: No completed work sessions
+        - paragraph [ref=e198]: "The button creates one Google Calendar event for the latest completed work session after `.env` is configured."
+      - article [ref=e199]:
+        - generic [ref=e201]:
+          - paragraph [ref=e202]: How it works
+          - heading "Timer logic" [level=2] [ref=e203]
+        - list [ref=e204]:
+          - listitem [ref=e205]: "The active timer is stored in `localStorage`, so a page reload does not destroy the current session."
+          - listitem [ref=e206]: Completed work, short break, and long break sessions are saved through Flask API into the database.
+          - listitem [ref=e207]: Daily, weekly, and monthly hours are calculated from stored database sessions.
+          - listitem [ref=e208]: Settings control durations, auto-start for the next session, and the long-break interval.
+  - contentinfo [ref=e209]:
+    - paragraph [ref=e210]: Bootstrap 5.3, Flask, SQLite, Vanilla JS, Chart.js, optional Google Calendar sync.
+    - paragraph [ref=e211]: © 2026 Pomodoro Work Tracker

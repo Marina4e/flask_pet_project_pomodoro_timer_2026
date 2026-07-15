@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="hero-card compact-hero">
+    <div>
+      <p class="eyebrow">Statistics Dashboard</p>
+      <h1>Productivity Statistics</h1>
+      <p class="hero-text">
+        Compare focus sessions for today, this week, and this month, then
+        review the last seven days on the chart.
+      </p>
+    </div>
+  </section>
+
+  <section class="dashboard-grid single-column">
+    {% include "components/stats_cards.html" %}
+    <article class="card chart-card">
+      <div class="card-heading chart-heading">
+        <div>
+          <p class="eyebrow">Seven-Day Productivity</p>
+          <h2>Activity Trend</h2>
+        </div>
+        <div class="chart-heading-actions">
+          <span class="inline-note" id="chart-timezone-note">{{ default_timezone }}</span>
+          <button
+            class="btn button button-ghost chart-toggle"
+            id="productivity-chart-toggle"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#productivity-chart-collapse"
+            aria-expanded="false"
+            aria-controls="productivity-chart-collapse"
+          >
+            Show chart
+          </button>
+        </div>
+      </div>
+      <div class="collapse" id="productivity-chart-collapse">
+        <div class="chart-content">
+          <canvas id="productivity-chart" aria-label="Productivity trend"></canvas>
+        </div>
+      </div>
+    </article>
+  </section>
+{% endblock %}

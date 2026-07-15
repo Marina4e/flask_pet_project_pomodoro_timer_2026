@@ -1,0 +1,178 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - paragraph [ref=e6]: Flask Portfolio Project
+        - link "Pomodoro Work Tracker" [ref=e7] [cursor=pointer]:
+          - /url: /
+      - navigation "Main navigation" [ref=e8]:
+        - generic [ref=e9]:
+          - link "Home" [ref=e10] [cursor=pointer]:
+            - /url: /
+          - link "Statistics" [ref=e11] [cursor=pointer]:
+            - /url: /statistics
+          - link "Calendar" [ref=e12] [cursor=pointer]:
+            - /url: /calendar
+  - main [ref=e13]:
+    - generic "Pomodoro Work Tracker sections" [ref=e15]:
+      - generic [ref=e16]:
+        - button "Pomodoro Timer" [ref=e17] [cursor=pointer]
+        - button "Statistics" [ref=e18] [cursor=pointer]
+        - button "Calendar" [ref=e19] [cursor=pointer]
+        - button "Settings" [ref=e20] [cursor=pointer]
+        - button "Google Calendar" [ref=e21] [cursor=pointer]
+      - generic [ref=e26]:
+        - img "Pomodoro tomato timer" [ref=e28]
+        - generic [ref=e30]:
+          - paragraph [ref=e31]: Dashboard section
+          - heading "Pomodoro Timer" [level=1] [ref=e32]
+          - paragraph [ref=e33]: Start focused work intervals, pause when needed, and save completed sessions to SQLite.
+          - paragraph [ref=e34]:
+            - link "Open Timer" [ref=e35] [cursor=pointer]:
+              - /url: /#timer-widget
+      - button "Previous" [ref=e36] [cursor=pointer]
+      - button "Next" [ref=e39] [cursor=pointer]
+    - article [ref=e43]:
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - paragraph [ref=e46]: Timer
+          - heading "Pomodoro Timer" [level=2] [ref=e47]
+        - generic [ref=e48]: Ready
+      - generic [ref=e52]:
+        - paragraph [ref=e53]:
+          - text: Press
+          - strong [ref=e54]: Start
+          - text: to begin a focus interval. The completed session is saved automatically through the Flask API.
+        - generic [ref=e55]:
+          - generic [ref=e56]: "Session #1"
+          - generic [ref=e57]: "Next: short break"
+          - generic [ref=e176]: Test mode active
+      - group "Timer presets" [ref=e58]:
+        - button "Standard 25/5" [ref=e59] [cursor=pointer]
+        - button "Test mode 10s / 5s" [ref=e60] [cursor=pointer]
+      - group "Timer modes" [ref=e61]:
+        - button "Work" [ref=e62] [cursor=pointer]
+        - button "Short break" [ref=e63] [cursor=pointer]
+        - button "Long break" [ref=e64] [cursor=pointer]
+      - paragraph [ref=e65]:
+        - text: "Current duration:"
+        - strong [ref=e66]: 25 min
+      - generic [ref=e67]: 25:00
+      - paragraph [ref=e69]: The timer saves the completed session automatically through Flask API.
+      - generic [ref=e70]:
+        - button "Start" [ref=e71] [cursor=pointer]
+        - button "Pause" [disabled]
+        - button "Resume" [disabled]
+        - button "Reset" [disabled]
+        - link "Export CSV" [ref=e75] [cursor=pointer]:
+          - /url: /api/export/sessions.csv
+    - generic [ref=e76]:
+      - region "Productivity statistics" [ref=e77]:
+        - article [ref=e78]:
+          - generic [ref=e79]:
+            - paragraph [ref=e80]: Today
+            - paragraph [ref=e81]: 0.01 h
+            - paragraph [ref=e82]: Focus time today
+            - paragraph [ref=e83]:
+              - generic [ref=e84]: 0.67 min
+              - generic [ref=e85]: 2026-07-15 — 2026-07-15
+        - article [ref=e86]:
+          - generic [ref=e87]:
+            - paragraph [ref=e88]: This Week
+            - paragraph [ref=e89]: 0.44 h
+            - paragraph [ref=e90]: Focus time this week
+            - paragraph [ref=e91]:
+              - generic [ref=e92]: 26.67 min
+              - generic [ref=e93]: 2026-07-13 — 2026-07-19
+        - article [ref=e94]:
+          - generic [ref=e95]:
+            - paragraph [ref=e96]: This Month
+            - paragraph [ref=e97]: 0.86 h
+            - paragraph [ref=e98]: Focus time this month
+            - paragraph [ref=e99]:
+              - generic [ref=e100]: 51.67 min
+              - generic [ref=e101]: 2026-07-01 — 2026-07-31
+        - article [ref=e102]:
+          - generic [ref=e103]:
+            - paragraph [ref=e104]: Completed Pomodoros
+            - paragraph [ref=e105]: "4"
+            - paragraph [ref=e106]: Completed work sessions today
+            - paragraph [ref=e107]:
+              - generic [ref=e108]: Work sessions
+              - generic [ref=e109]: Today
+      - article [ref=e110]:
+        - generic [ref=e111]:
+          - generic [ref=e112]:
+            - paragraph [ref=e113]: Seven-Day Productivity
+            - heading "Productivity trend" [level=2] [ref=e114]
+          - generic [ref=e115]:
+            - generic [ref=e116]: Europe/Kyiv
+            - button "Show chart" [active] [ref=e233] [cursor=pointer]
+    - article [ref=e119]:
+      - generic [ref=e121]:
+        - paragraph [ref=e122]: Settings
+        - heading "Timer Settings" [level=2] [ref=e123]
+      - generic [ref=e124]:
+        - generic [ref=e125]:
+          - generic [ref=e126]:
+            - generic [ref=e127]: Work duration
+            - combobox "Work duration" [ref=e128]:
+              - option "15"
+              - option "25" [selected]
+              - option "30"
+              - option "45"
+              - option "60"
+          - generic [ref=e129]:
+            - generic [ref=e130]: Short break
+            - combobox "Short break" [ref=e131]:
+              - option "5" [selected]
+              - option "10"
+              - option "15"
+          - generic [ref=e132]:
+            - generic [ref=e133]: Long break
+            - combobox "Long break" [ref=e134]:
+              - option "5"
+              - option "10"
+              - option "15" [selected]
+          - generic [ref=e135]:
+            - generic [ref=e136]: Timezone
+            - textbox "Timezone" [ref=e137]:
+              - /placeholder: Europe/Kyiv
+              - text: Europe/Kyiv
+            - text: Used for daily, weekly, and monthly statistics. Enter an IANA timezone such as Europe/Kyiv.
+            - generic [ref=e138]:
+              - text: "Active timezone:"
+              - status [ref=e139]: Europe/Kyiv
+        - heading [level=3] [ref=e142]:
+          - button "Advanced Settings" [ref=e143] [cursor=pointer]
+        - generic [ref=e144]:
+          - button "Save Settings" [ref=e145] [cursor=pointer]
+          - status [ref=e146]: Settings are stored locally and used by the timer and statistics.
+    - generic [ref=e147]:
+      - article [ref=e148]:
+        - generic [ref=e149]:
+          - generic [ref=e150]:
+            - paragraph [ref=e151]: Google Calendar
+            - heading "Sync latest work session" [level=2] [ref=e152]
+          - generic [ref=e153]: Setup
+        - paragraph [ref=e154]: "Add calendar ID and service-account credentials to `.env` to enable sync."
+        - generic [ref=e155]:
+          - generic [ref=e156]:
+            - generic [ref=e157]: Calendar ID
+            - strong [ref=e158]: Not configured
+          - generic [ref=e159]:
+            - generic [ref=e160]: Latest work session
+            - strong [ref=e161]: "#19"
+        - paragraph [ref=e162]: "The button creates one Google Calendar event for the latest completed work session after `.env` is configured."
+      - article [ref=e163]:
+        - generic [ref=e165]:
+          - paragraph [ref=e166]: How it works
+          - heading "Timer logic" [level=2] [ref=e167]
+        - list [ref=e168]:
+          - listitem [ref=e169]: "The active timer is stored in `localStorage`, so a page reload does not destroy the current session."
+          - listitem [ref=e170]: Completed work, short break, and long break sessions are saved through Flask API into the database.
+          - listitem [ref=e171]: Daily, weekly, and monthly hours are calculated from stored database sessions.
+          - listitem [ref=e172]: Settings control durations, auto-start for the next session, and the long-break interval.
+  - contentinfo [ref=e173]:
+    - paragraph [ref=e174]: Bootstrap 5.3, Flask, SQLite, Vanilla JS, Chart.js, optional Google Calendar sync.
+    - paragraph [ref=e175]: © 2026 Pomodoro Work Tracker

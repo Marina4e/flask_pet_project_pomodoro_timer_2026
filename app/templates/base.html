@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} | Pomodoro Work Tracker</title>
+    <meta
+      name="description"
+      content="A Flask portfolio project for Pomodoro timing, productivity statistics, an activity calendar, CSV export, and optional Google Calendar sync."
+    >
+    <script>
+      (() => {
+        const storedTheme = localStorage.getItem("pomodoro.theme") || "system";
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const resolvedTheme = storedTheme === "system" ? (prefersDark ? "dark" : "light") : storedTheme;
+        document.documentElement.dataset.theme = resolvedTheme;
+        document.documentElement.setAttribute("data-bs-theme", resolvedTheme);
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    >
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    >
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='36' r='20' fill='%23ff5d36'/%3E%3Cpath d='M32 12c4 6 10 7 14 6-4 5-6 8-6 12H24c0-4-2-7-6-12 4 1 10 0 14-6Z' fill='%2317836d'/%3E%3C/svg%3E"
+    >
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+  </head>
+  <body class="site-surface">
+    <div class="page-shell container-xxl px-3 px-lg-4">
+      <header class="site-header navbar navbar-expand-lg glass-panel">
+        <div class="container-fluid p-0">
+          <div class="brand-block">
+            <p class="eyebrow mb-1">Flask Portfolio Project</p>
+            <a class="brand" href="{{ url_for('pages.index') }}">Pomodoro Work Tracker</a>
+          </div>
+          <button
+            class="navbar-toggler border-0 shadow-none"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#siteNavigation"
+            aria-controls="siteNavigation"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <nav class="collapse navbar-collapse justify-content-end" id="siteNavigation" aria-label="Main navigation">
+            <div class="site-nav navbar-nav">
+              <a class="app-nav-link nav-link" href="{{ url_for('pages.index') }}">Home</a>
+              <a class="app-nav-link nav-link" href="{{ url_for('pages.statistics_page') }}">Statistics</a>
+              <a class="app-nav-link nav-link" href="{{ url_for('pages.calendar_page') }}">Calendar</a>
+            </div>
+          </nav>
+        </div>
+      </header>
+
+      <main class="page-content">
+        {% block content %}{% endblock %}
+      </main>
+
+      <footer class="site-footer glass-panel">
+        <p>Bootstrap 5.3, Flask, SQLite, Vanilla JS, Chart.js, optional Google Calendar sync.</p>
+        <p>&copy; {{ current_year }} Pomodoro Work Tracker</p>
+      </footer>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      defer
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js" defer></script>
+    <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/settings.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/timer.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/statistics.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/integrations.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/calendar.js') }}" defer></script>
+  </body>
+</html>

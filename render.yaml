@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: pomodoro-work-tracker
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && chmod +x start.sh
+    startCommand: ./start.sh
+    healthCheckPath: /api/health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: POMODORO_TEST_MODE
+        value: false
+      - key: DEFAULT_TIMEZONE
+        value: Europe/Kyiv
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false

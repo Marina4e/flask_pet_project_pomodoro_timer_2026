@@ -1,0 +1,157 @@
+@media (max-width: 1100px) {
+  .carousel-page-item,
+  .carousel-page-container {
+    min-height: 360px;
+  }
+
+  .carousel-page-container {
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+  }
+
+  .dashboard-grid,
+  .calendar-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .timer-hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 980px) {
+  .site-header,
+  .site-footer {
+    padding: 1rem;
+  }
+
+  .slide-preview-grid,
+  .sync-summary,
+  .settings-primary-grid,
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .site-surface {
+    padding-top: 0.75rem;
+  }
+
+  .page-shell {
+    max-width: calc(100% - 1rem);
+  }
+
+  .carousel-page-item,
+  .carousel-page-container {
+    min-height: 420px;
+  }
+
+  .carousel-page-container {
+    padding-top: 2.5rem;
+    padding-bottom: 4.6rem;
+  }
+
+  .carousel-page-caption,
+  .carousel-page-caption.text-start,
+  .carousel-page-caption.text-end {
+    text-align: center !important;
+  }
+
+  .carousel-page-caption .hero-text-wide,
+  .carousel-page-caption .hero-text-wide.ms-auto,
+  .carousel-page-caption .hero-text-wide.mx-auto {
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .hero-stage {
+    min-height: 300px;
+  }
+
+  .carousel-page-image {
+    width: min(100%, 150px);
+    max-height: 150px;
+  }
+
+  .site-nav {
+    padding-top: 0.75rem;
+  }
+
+  .timer-display {
+    font-size: 3.35rem;
+  }
+
+  .preset-switch,
+  .mode-switch,
+  .timer-actions,
+  .hero-actions,
+  .toolbar-actions,
+  .settings-actions,
+  .hero-chip-row {
+    flex-direction: column;
+  }
+
+  .button,
+  .preset-button,
+  .mode-button {
+    width: 100%;
+  }
+
+  .chart-heading {
+    align-items: flex-start;
+  }
+
+  .chart-heading-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .chart-toggle {
+    width: auto;
+  }
+
+  .calendar-weekdays,
+  .calendar-grid {
+    gap: 0.4rem;
+  }
+
+  .calendar-day {
+    min-height: 72px;
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .settings-primary-grid,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 2.3rem;
+  }
+
+  .slide-title {
+    font-size: 1.9rem;
+  }
+
+  .card {
+    padding: 1.2rem;
+  }
+
+  .site-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .carousel-control-prev-icon,
+  .carousel-control-next-icon {
+    width: 2.65rem;
+    height: 2.65rem;
+  }
+}
