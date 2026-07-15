@@ -32,7 +32,7 @@
       if (status.calendar_id && !status.calendar_id_valid) {
         return {
           state: "error",
-          text: "Replace the embed or sharing URL with the Calendar ID from Google Calendar settings.",
+          text: "Use a Calendar ID or an official Google Calendar embed URL containing src=.",
         };
       }
       if (!status.configured) {
@@ -63,7 +63,9 @@
       }
       return {
         state: "success",
-        text: "Ready. The button will create one event for the latest completed focus session.",
+        text: status.calendar_id_normalized
+          ? "Ready. The Calendar ID was extracted from the Google embed URL. The button will create one event for the latest completed focus session."
+          : "Ready. The button will create one event for the latest completed focus session.",
       };
     }
 
@@ -75,7 +77,9 @@
         elements.calendarIdLabel.textContent = "A URL was entered — use Calendar ID only";
       } else if (status.configured) {
         setState(elements.statusPill, "success", "Ready");
-        elements.calendarIdLabel.textContent = status.calendar_id;
+        elements.calendarIdLabel.textContent = status.calendar_id_normalized
+          ? `${status.calendar_id} (read from embed URL)`
+          : status.calendar_id;
       } else {
         setState(elements.statusPill, "warning", "Setup required");
         elements.calendarIdLabel.textContent = status.calendar_id || "Missing from .env";

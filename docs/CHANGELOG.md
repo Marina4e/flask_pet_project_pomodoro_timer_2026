@@ -151,8 +151,8 @@
 
 - Timer animation now loads the GIF only while running or resumed and returns
   to the static clock for ready, paused, completed, and reset states.
-- Renamed the stale frontend `syncSheets()` Calendar handler to
-  `syncCalendar()` and kept Google Calendar behavior unchanged.
+- Renamed the stale frontend `syncSheets()` Calendar handler to the explicit
+  `syncGoogleCalendar()` and kept Google Calendar behavior unchanged.
 - README now documents secure service-account setup, direct Sheet sharing,
   exported columns, duplicate rules, quotas, and current pricing caveat.
 
@@ -248,3 +248,97 @@
 - Playwright verified work and break skipping with no inserted sessions
 - normal work and short-break completion stored and counted both durations
 - final browser console — `0 errors`, `0 warnings`
+
+## 2026-07-15 — Calendar runtime debugging and bilingual Google documentation
+
+### Added
+
+- Bilingual `docs/GOOGLE_INTEGRATIONS_GUIDE.md` covering Calendar, Sheets,
+  service-account setup, resource sharing, IDs, credentials conversion,
+  artificial test sessions, API requests, notifications, troubleshooting,
+  security, data flow, and exact symbol responsibilities.
+- Focused Calendar tests for missing configuration parts, no completed work,
+  10-second test-mode work, newer-break exclusion, malformed-credential
+  non-disclosure, and Calendar/Sheets independence.
+
+### Changed
+
+- `README.md` is now one equivalent Ukrainian/English project guide with full
+  startup, timer, SQLite, Google Cloud, Docker, verification, usability, and
+  project-defense coverage.
+- `.env.example` now distinguishes Calendar ID from URLs and explains the
+  actual optional boundary without introducing an unused feature flag.
+- Repeated Calendar sync errors no longer expose the external Google event ID;
+  they return `session_id` plus `sync_status=already_synced`.
+- API and file-map documentation now includes both Google integrations and the
+  new guide.
+
+### Verified
+
+- real local status: invalid URL-shaped Calendar ID, structurally complete
+  credential shape, unsynced completed work `#53`, button readiness false
+- real local sync endpoint: controlled `400` before any external Google call
+- focused Calendar/Sheets tests — `31 passed`
+- full test suite — `85 passed`; compileall, Ruff, Black, route listing, and
+  dependency consistency passed
+- live artificial-session command — passed against a temporary SQLite database;
+  created/detected/deleted one 10-second work record without touching user data
+- no frontend template, CSS, timer, carousel, statistics UI, or calendar UI
+  changes
+
+## 2026-07-15 — Separate Ukrainian and English README files
+
+### Added
+
+- Added `README.en.md` as the English-only project guide.
+
+### Changed
+
+- `README.md` now contains only the Ukrainian project guide.
+- Both README files link to each other and to the standalone bilingual
+  `docs/GOOGLE_INTEGRATIONS_GUIDE.md` setup guide.
+- Renamed the separate guide to make its Pomodoro Timer, Google Cloud, Google
+  Calendar, and Google Sheets scope explicit, and added links back to both
+  language README files.
+
+### Scope
+
+- Documentation-only correction; no frontend, backend, database, or integration
+  behavior was changed.
+
+### Verified
+
+- Both README files contain all 19 numbered sections, balanced code fences, and
+  valid local links; the English README contains no Cyrillic content.
+- `git diff --check` passed apart from informational Windows line-ending
+  warnings.
+- Full pytest suite — `85 passed`.
+
+## 2026-07-15 — Calendar embed normalization and GitHub CI
+
+### Added
+
+- Added `.github/workflows/ci.yml` with Python 3.12 dependency installation,
+  compileall, Ruff, Black, `pip check`, and pytest for push, pull request, and
+  manual workflow runs.
+- Added CI, Python, and Flask badges to the Ukrainian and English README files.
+- Added `calendar_id_normalized` to the safe Calendar status response.
+
+### Changed
+
+- Calendar configuration now accepts a direct Calendar ID or an official Google
+  Calendar embed URL containing `src`; only the decoded ID reaches Google API.
+- Unsupported URLs, HTML snippets, and embed URLs without `src` remain invalid.
+- Calendar UI now explains when an ID was read from an embed URL and enables
+  sync when all normal readiness conditions are satisfied.
+
+### Verified
+
+- Live status for work `#63`: configured, normalized, and ready to sync.
+- Real Calendar sync: `200`, event created, Calendar link returned, and the
+  SQLite duplicate marker stored for `#63`.
+- Focused Calendar/frontend suite — `16 passed`; Ruff, Black, and JavaScript
+  syntax checks passed.
+- Full suite — `86 passed`; compileall and `pip check` passed.
+- Edge headless rendered `#63 (synced)`, the already-synced message, and the
+  expected duplicate-protection disabled button.

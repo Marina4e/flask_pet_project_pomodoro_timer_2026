@@ -1,5 +1,126 @@
 # Журнал роботи
 
+## 2026-07-15 — Робочий Calendar sync і GitHub CI
+
+### Мета
+
+Зробити кнопку Calendar sync робочою з наявним official embed URL, реально
+перевірити external event creation і додати CI та badges для GitHub.
+
+### Причина
+
+- Credentials були присутні й structurally complete.
+- Latest completed focus `#63` був unsynced.
+- Старий validator відхиляв весь URL, хоча official embed URL містив правильний
+  percent-encoded Calendar ID у query parameter `src`.
+
+### Виконана робота
+
+- Додано safe normalization: direct ID проходить без змін, official Google
+  embed URL із `src` декодується, інші URL/HTML відхиляються.
+- Status schema отримала browser-safe `calendar_id_normalized`; frontend показує
+  normalized state і активує кнопку за стандартною readiness logic.
+- Реальний sync створив Google Calendar event для work `#63`, повернув link і
+  записав event marker у SQLite. Повторний sync цієї session тепер блокується.
+- Додано `.github/workflows/ci.yml` і CI/Python/Flask badges в обидва README.
+- Оновлено `.env.example`, README та Google/architecture documentation.
+
+### Перевірка
+
+- focused Calendar/frontend pytest — PASSED (`16 passed`)
+- full pytest — PASSED (`86 passed`)
+- compileall, `pip check` — PASSED
+- Ruff, Black, JavaScript syntax — PASSED
+- live safe status — configured/normalized/ready для `#63`
+- real Calendar sync — PASSED (`200`, event created, marker stored)
+- Edge headless UI — PASSED (`#63 (synced)`, already-synced message, duplicate
+  button disabled)
+
+## 2026-07-15 — Окремі український та англійський README
+
+### Мета
+
+Розділити двомовний README на два самостійні мовні файли та залишити інструкцію
+Google Cloud для Pomodoro Timer, Google Calendar і Google Sheets окремим файлом,
+на який посилаються обидва README.
+
+### Виконана робота
+
+- `README.md` залишено українською мовою.
+- Створено окремий англомовний `README.en.md` з еквівалентною структурою.
+- Обидва README отримали взаємні посилання та пряме посилання на
+  `docs/GOOGLE_INTEGRATIONS_GUIDE.md`.
+- Окрему Google-інструкцію перейменовано так, щоб назва прямо описувала setup
+  Pomodoro Timer, Google Cloud, Google Calendar і Google Sheets; у ній додано
+  посилання назад на обидва README.
+- Frontend, backend, `.env`, Google integration behavior і SQLite не змінювалися.
+
+### Перевірка
+
+- Обидва README мають по 19 numbered sections і збалансовані code fences.
+- `README.en.md` не містить кириличного контенту.
+- Усі локальні Markdown-посилання в обох README та Google guide існують.
+- `git diff --check` — PASSED; Windows line-ending warnings є інформаційними.
+- Full pytest — PASSED (`85 passed`).
+
+## 2026-07-15 — Calendar runtime debug і двомовна Google документація
+
+### Мета
+
+Точно пояснити, чому `Sync to Google Calendar` не активується, підтвердити
+normal/test-mode session rules, дати безпечну artificial-session команду й
+оформити повні українську та англійську інструкції без redesign frontend.
+
+### Діагностика
+
+- Реальний safe runtime status: Calendar ID присутній, але має URL form;
+  credentials присутні й мають required structural fields; latest completed
+  work `#53` не synchronized.
+- Frontend condition обчислюється як
+  `configured && latest_work_session_id && !latest_work_session_synced`, тому
+  invalid ID закономірно залишає кнопку disabled.
+- Real `POST /api/integrations/google-calendar/sync` повернув controlled `400`
+  про Calendar ID до побудови Google client; external write і DB mutation не
+  відбулися.
+- Handler та route правильні: `syncGoogleCalendar()` →
+  `/api/integrations/google-calendar/sync`.
+
+### Виконана робота
+
+- Додано Calendar regressions для missing ID/credentials, no session,
+  10-second work, newer break, malformed JSON safety та Sheets independence.
+- Duplicate `409` більше не повертає external Google event ID.
+- `.env.example` пояснює Calendar ID, one-line JSON і фактичну optional model.
+- `README.md` перебудовано як один equivalent Ukrainian/English документ.
+- Створено bilingual `docs/GOOGLE_INTEGRATIONS_GUIDE.md` з setup, commands,
+  API, event payload, timezone, duplicate guard, notifications, security,
+  troubleshooting, symbols, Mermaid flow та future ideas.
+- Оновлено status, changelog, work log, file map і API reference.
+
+### Перевірка на цьому етапі
+
+- focused Calendar/Sheets pytest — PASSED (`31 passed`)
+- full pytest — PASSED (`85 passed`)
+- compileall, Ruff, Black, route listing, `pip check` — PASSED
+- `python scripts/check_database.py` — PASSED, read-only, `54` sessions
+- real Calendar status endpoint — `200`
+- real Calendar sync with invalid URL-shaped ID — controlled `400`
+- live artificial-session HTTP smoke on temporary SQLite — створено 10-second
+  work, status побачив latest unsynced session, запис видалено; user DB не
+  використовувалася
+
+### Не змінено
+
+- frontend templates, CSS, JavaScript, timer UI, carousel, statistics UI,
+  calendar UI, database schema та real `.env`
+- реальний Google Calendar event не створено й не заявляється як verified
+
+### Наступний крок перевірки
+
+Після заміни URL на справжній Calendar ID користувач може створити 10-second
+work через test mode або documented `POST /api/sessions`, натиснути sync і
+перевірити external event у shared Calendar.
+
 ## 2026-07-15 — Пояснення Google integration і документація для захисту
 
 ### Мета

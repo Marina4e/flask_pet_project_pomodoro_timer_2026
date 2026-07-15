@@ -13,6 +13,11 @@
 - explicit `POMODORO_TEST_MODE` flow with `10s / 5s` preset
 - read-only `scripts/check_database.py`
 - automated pytest suite with mocked Google Calendar and Google Sheets success, duplicate protection, and controlled-error coverage
+- GitHub Actions CI for compileall, Ruff, Black, dependency consistency, and
+  pytest on Python 3.12, with status badges in both README files
+- separate Ukrainian `README.md` and English `README.en.md`, both linking the
+  standalone bilingual Google Cloud setup guide with safe Calendar test-session
+  commands and exact button-state documentation
 
 ## Verified In This Session
 
@@ -103,8 +108,8 @@
 - Optional content is marked in green, while values required only after an
   integration is selected are marked in orange. Both layouts remain responsive
   and have no mobile horizontal overflow.
-- Calendar status now rejects an embed/share URL before client creation and
-  tells the user to copy the actual Calendar ID.
+- Calendar status accepts a direct ID or normalizes an official Google embed
+  URL with `src`; unsupported URLs are rejected before client creation.
 - Calendar client initialization now converts malformed or incomplete
   service-account credentials into a controlled project error.
 - Sheets disabled mode accepts blank settings without parsing credentials or
@@ -124,12 +129,85 @@
   and read-only SQLite inspection passed.
 - Playwright used a separate temporary SQLite database. It verified the general
   Save Settings button, both Sheets buttons, Calendar Sync UI, controlled
-  missing credentials, embed-URL rejection, desktop/dark/mobile layout, and a
+  missing credentials, unsupported-URL rejection, desktop/dark/mobile layout, and a
   clean final console (`0` errors, `0` warnings).
+
+## 2026-07-15 Initial Calendar Runtime Debugging and Bilingual Google Guide
+
+- Reproduced the current local Calendar state without printing secrets:
+  credentials are present, completed unsynced work session `#53` exists, but
+  `GOOGLE_CALENDAR_ID` has URL form and therefore fails ID validation.
+- Confirmed through the real Flask endpoint that Calendar status returns `200`
+  with `configured=false` and the sync request returns the controlled `400`
+  invalid-ID message before creating a Google client or mutating SQLite.
+- Confirmed the frontend handler is `syncGoogleCalendar()`, calls the correct
+  Calendar endpoint, and enables the button only for configured + existing +
+  unsynced latest work.
+- Added focused regressions for missing ID, missing credentials, no completed
+  work, a completed 10-second work session, exclusion of a newer break,
+  invalid-JSON secret non-disclosure, and Calendar/Sheets independence.
+- Duplicate Calendar conflicts now return `session_id` and
+  `sync_status=already_synced` without returning the external Google event ID.
+- Split the project documentation into Ukrainian `README.md` and English
+  `README.en.md`, and kept `docs/GOOGLE_INTEGRATIONS_GUIDE.md` as the standalone
+  bilingual Google Cloud setup guide with
+  exact button conditions, artificial-session commands, manual API calls,
+  troubleshooting, notification boundaries, symbol responsibilities, Mermaid
+  flow, official sources, and future improvements.
+- Updated `.env.example` with Calendar-ID and one-line-JSON guidance while
+  retaining only variables that the application actually reads. Calendar is
+  optional through blank required values; the current implementation has no
+  separate `GOOGLE_CALENDAR_ENABLED` flag.
+- Focused Calendar/Sheets suite passes: `31 passed`; full suite passes:
+  `85 passed`. Compileall, Ruff, Black, route listing, and `pip check` pass.
+- A live temporary-database HTTP smoke created one 10-second completed `work`
+  session through `POST /api/sessions`, confirmed it as the latest unsynced
+  Calendar candidate, deleted it through the API, and did not use the user's
+  SQLite database.
+- At this stage a real event was not created because the old validator rejected
+  the URL-shaped value. The later normalization section below records the
+  successful real sync without changing the user's `.env`.
+
+## 2026-07-15 Separate Ukrainian and English READMEs
+
+- `README.md` now contains the Ukrainian project guide only.
+- `README.en.md` contains the equivalent English project guide only.
+- Both language files link directly to each other and to the standalone
+  `docs/GOOGLE_INTEGRATIONS_GUIDE.md` setup guide for Pomodoro Timer, Google
+  Cloud, Google Calendar, and Google Sheets.
+- This correction changes documentation only; frontend, backend, integration
+  behavior, configuration, and the user's SQLite database remain untouched.
+- Markdown structure, language separation, local links, and `git diff --check`
+  passed; the full automated suite remains green with `85 passed`.
+
+## 2026-07-15 Calendar Embed Normalization, Real Sync, and GitHub CI
+
+- Confirmed from the screenshot and live status that completed focus `#63` was
+  unsynced and credentials were present, but the configured value was an
+  official Google Calendar embed URL.
+- `GoogleCalendarService` now accepts either a direct Calendar ID or an official
+  Google Calendar URL with a non-empty `src`, decodes that value, and sends only
+  the normalized ID to Google. Arbitrary URLs, HTML, and embed URLs without
+  `src` remain invalid.
+- Live status changed from `configured=false` to `configured=true` and reported
+  that the Calendar ID was normalized; frontend readiness became true for
+  `#63`.
+- One real `POST /api/integrations/google-calendar/sync` succeeded with `200`,
+  created the event for work `#63`, returned a Calendar link, and stored the
+  duplicate-protection marker in SQLite.
+- After that success the button is correctly disabled for `#63`; completing the
+  next focus session makes a new unsynced work record and enables it again.
+- Added `.github/workflows/ci.yml` for push, pull request, and manual runs on
+  Python 3.12. Both README files now show CI, Python, and Flask badges.
+- Focused Calendar/frontend verification passes: `16 passed`; Ruff, Black, and
+  JavaScript syntax checks pass. Full project verification passes: `86 passed`;
+  compileall and `pip check` also pass.
+- Edge headless rendered the real homepage with `#63 (synced)`, the
+  already-in-Calendar explanation, and the sync button disabled against a
+  duplicate.
 
 ## Known Limitations
 
-- real Google Calendar event creation was not tested with external credentials in this session
 - real Google Sheets writes were not tested with external credentials in this session
 - Google API UI success paths were browser-tested with mocked responses; this is
   not evidence of access to a real external Calendar or Sheet

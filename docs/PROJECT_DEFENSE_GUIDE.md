@@ -141,7 +141,7 @@ PowerShell, тому значення поточної shell session має пр
 | `DEFAULT_TIMEZONE` | ні | `Europe/Kyiv` | timezone першого settings row | створення settings |
 | `DEFAULT_CYCLES_BEFORE_LONG_BREAK` | ні | `4` | початковий long-break interval | startup/створення settings |
 | `POMODORO_TEST_MODE` | ні | `false` | дозволяє preset 10 s / 5 s | startup |
-| `GOOGLE_CALENDAR_ID` | лише для Calendar sync | blank | ID календаря, не embed URL | status/sync |
+| `GOOGLE_CALENDAR_ID` | лише для Calendar sync | blank | direct ID або official embed URL із `src` | status/sync |
 | `GOOGLE_CALENDAR_CREDENTIALS_JSON` | лише для Calendar sync | blank | one-line service-account JSON | Calendar client creation |
 | `GOOGLE_CALENDAR_EVENT_PREFIX` | ні | `Pomodoro` | початок event summary | Calendar payload creation |
 | `GOOGLE_CALENDAR_EVENT_COLOR_ID` | ні | blank | optional Google event color | Calendar payload creation |
@@ -458,8 +458,8 @@ Previous/Next змінюють visible month, а day details показують 
 Calendar integration опціональна, але окремого `GOOGLE_CALENDAR_ENABLED` у
 проєкті немає. Готовність визначається наявністю:
 
-- `GOOGLE_CALENDAR_ID` — саме ID із **Settings and sharing → Integrate
-  calendar**, не URL `https://calendar.google.com/calendar/embed?...`;
+- `GOOGLE_CALENDAR_ID` — рекомендовано ID із **Settings and sharing → Integrate
+  calendar**; official embed URL із `src` також автоматично нормалізується;
 - `GOOGLE_CALENDAR_CREDENTIALS_JSON` — повний one-line service-account JSON;
 - permission для `client_email` змінювати events у цьому календарі.
 
@@ -473,7 +473,8 @@ Calendar integration опціональна, але окремого `GOOGLE_CAL
 | `sync_latest_work_session(timezone_name)` | optional timezone | створює event, записує `google_calendar_event_id`, повертає IDs/link |
 | `_build_event_payload(session, timezone)` | model + IANA timezone | summary, description, local start/end, optional color |
 | `_build_calendar_service()` | server config | parsed credentials → Google Calendar v3 client |
-| `_is_calendar_id_valid(value)` | config value | відкидає blank, URL і whitespace value до Google request |
+| `_is_calendar_id_valid(value)` | config value | приймає direct ID або official embed URL із `src` |
+| `_normalize_calendar_id(value)` | config value | повертає direct/decoded ID або `None` до Google request |
 
 `sync_latest_work_session` бере тільки latest `work`. Break rows не стають
 events. Якщо `google_calendar_event_id` уже є, повертається 409 Conflict. Calendar
@@ -934,7 +935,7 @@ Fallback, якщо зовнішній Google API недоступний:
 > CSV export є read-only. Він бере rows, конвертує timestamps у вибрану timezone
 > і повертає файл. Далі є дві незалежні optional Google integrations. Calendar
 > створює одну event лише для останньої completed work session. Перед request
-> перевіряється, що користувач указав саме Calendar ID, а не embed URL. Після
+> direct Calendar ID або `src` з official embed URL нормалізується. Після
 > success event ID зберігається у SQLite, тому повторний sync блокується.
 >
 > Google Sheets має окремий feature flag і за замовчуванням вимкнений. Коли він

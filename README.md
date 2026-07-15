@@ -1,660 +1,466 @@
 # Pomodoro Work Tracker
 
-`Pomodoro Work Tracker` — це невеликий навчальний Flask-проєкт для локального
-запуску Pomodoro-таймера, збереження завершених сесій у SQLite, перегляду
-статистики, календаря активності, експорту в CSV і простої синхронізації
-останньої робочої сесії в Google Calendar.
+[![CI](https://github.com/Marina4e/flask_pet_project_pomodoro_timer_2026/actions/workflows/ci.yml/badge.svg)](https://github.com/Marina4e/flask_pet_project_pomodoro_timer_2026/actions/workflows/ci.yml)
+![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)
+![Flask 3.1](https://img.shields.io/badge/Flask-3.1-000000?logo=flask&logoColor=white)
 
-## Реально реалізовані можливості
+[English README](README.en.md) ·
+[Інструкція Google Cloud: Pomodoro, Calendar і Sheets](docs/GOOGLE_INTEGRATIONS_GUIDE.md) ·
+[Інструкція для захисту](docs/PROJECT_DEFENSE_GUIDE.md) ·
+[API docs після запуску](http://127.0.0.1:5000/api/docs)
 
-- `Start`, `Pause`, `Resume`, `Reset`, `Skip` для браузерного таймера
-- збереження завершених `work`, `short_break`, `long_break` сесій у SQLite
-- відновлення активного таймера після перезавантаження сторінки через `localStorage`
-- статистика за день, тиждень і місяць
-- 7-денний графік продуктивності
-- календар активності з деталями по вибраній даті
-- збереження налаштувань таймера, теми, звуку й часової зони
-- CSV-експорт сесій
-- Bootstrap Carousel на головній сторінці з `Previous` / `Next` і кнопками переходу до реальних сторінок та секцій
-- світла / темна / системна тема
-- звукове повідомлення після завершення сесії
-- проста синхронізація останньої завершеної `work`-сесії в Google Calendar
+`Pomodoro Work Tracker` — однокористувацький навчальний Flask-застосунок для
+focus-таймера, обліку завершених сесій, статистики, календаря активності,
+CSV-експорту та опціональних інтеграцій Google Calendar і Google Sheets.
 
-## Технології
+> Google-сервіси не є обов'язковими. Таймер, SQLite, статистика, календар
+> активності та CSV працюють без Google credentials.
 
-- Python 3.12+
-- Flask
-- Flask-SQLAlchemy
-- Flask-Migrate
-- Flask-Smorest
-- Marshmallow
-- Jinja2
-- SQLite
-- Vanilla JavaScript
-- Bootstrap 5.3
-- Chart.js
-- Gunicorn
-- pytest
+## Українська версія
 
-## Швидкий локальний запуск
+### 1. Призначення проєкту
 
-### Варіант 1: через ZIP
+`Pomodoro Work Tracker` допомагає чергувати focus та break-інтервали, зберігає
+нормально завершені сесії у локальній SQLite-базі й перетворює ці записи на
+статистику, календар активності та CSV. За бажанням користувач може вручну:
 
-1. Завантажте ZIP з GitHub.
-2. Розпакуйте архів.
-3. Відкрийте папку проєкту в терміналі.
+- створити Google Calendar event для останньої завершеної `work`-сесії;
+- експортувати завершені `work`-сесії як рядки Google Sheets.
 
-### Варіант 2: через `git clone`
+Це навчальний portfolio-проєкт: він демонструє повний шлях від браузерного
+таймера до Flask API, SQLAlchemy, migrations, зовнішніх Google API, тестів і
+Docker. Він не позиціонується як enterprise або multi-user SaaS.
+
+### 2. Реалізовані можливості
+
+- `Start`, `Pause`, `Resume`, `Reset` і `Skip` для `work`, `short_break` та
+  `long_break`;
+- автоматичний перехід між focus і break, а також опціональний auto-start;
+- відновлення активного countdown після reload через `localStorage`;
+- збереження нормально завершених focus і break-сесій у SQLite;
+- окремий облік `focus_minutes`, `break_minutes` і `total_tracked_minutes`;
+- статистика за день, тиждень і місяць та 7-денний Chart.js-графік;
+- activity calendar з деталями за вибраний день;
+- налаштування тривалості, циклів, теми, звуку та IANA timezone;
+- CSV export;
+- швидкий `POMODORO_TEST_MODE` з інтервалами `10 / 5 / 5` секунд;
+- ручна optional-синхронізація з Google Calendar і Google Sheets;
+- OpenAPI/Swagger, pytest, Ruff, Black, Docker і Gunicorn.
+
+### 3. Технології
+
+| Шар | Технології |
+| --- | --- |
+| Backend | Python 3.12+, Flask, Flask-Smorest, Marshmallow |
+| Data | Flask-SQLAlchemy, SQLite, Flask-Migrate/Alembic |
+| Frontend | Jinja2, Bootstrap 5.3, Vanilla JavaScript, Chart.js |
+| Google | Google Calendar API, Google Sheets API, service account |
+| Quality | pytest, Ruff, Black, compileall |
+| Deployment | Docker, Gunicorn, `start.sh` |
+
+### 4. Швидкий запуск на Windows
 
 ```powershell
 git clone <PROJECT_URL>
 cd flask_pet_project_pomodoro_timer_2026
-```
 
-### Запуск на Windows
-
-```powershell
 py -3.12 -m venv .venv
 .venv\Scripts\activate
-
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 
+Copy-Item .env.example .env
 python run.py
 ```
 
-Після запуску відкрийте:
+Відкрийте `http://127.0.0.1:5000`. Для зупинки натисніть `Ctrl+C`.
 
-```text
-http://127.0.0.1:5000
+`create_app()` завантажує `.env`, реєструє extensions і blueprints, застосовує
+migrations для локальної SQLite та створює default settings. Змінна, уже задана
+в PowerShell, має пріоритет над однойменним значенням із `.env`; після зміни
+`.env` сервер потрібно перезапустити.
+
+### 5. Основні environment variables
+
+```dotenv
+APP_ENV=development
+SECRET_KEY=replace-with-a-secure-secret
+DEBUG=true
+DATABASE_URL=sqlite:///pomodoro.db
+DEFAULT_TIMEZONE=Europe/Kyiv
+DEFAULT_CYCLES_BEFORE_LONG_BREAK=4
+POMODORO_TEST_MODE=false
+
+# Google Calendar: optional; leave required values blank to keep it unconfigured.
+GOOGLE_CALENDAR_ID=
+GOOGLE_CALENDAR_CREDENTIALS_JSON=
+GOOGLE_CALENDAR_EVENT_PREFIX=Pomodoro
+GOOGLE_CALENDAR_EVENT_COLOR_ID=
+
+# Google Sheets: independent and optional.
+GOOGLE_SHEETS_ENABLED=false
+GOOGLE_SHEETS_SPREADSHEET_ID=
+GOOGLE_SHEETS_CREDENTIALS_JSON=
 ```
 
-## Конфігурація середовища
+У поточній реалізації Calendar не має окремого
+`GOOGLE_CALENDAR_ENABLED`: інтеграція вважається не налаштованою, доки
+`GOOGLE_CALENDAR_ID` або `GOOGLE_CALENDAR_CREDENTIALS_JSON` порожні. Sheets має
+окремий прапорець `GOOGLE_SHEETS_ENABLED` і безпечні browser settings у SQLite.
 
-Скопіюйте `.env.example` у локальний `.env` і не додавайте `.env` або JSON-ключі
-Google до Git. Застосунок викликає `load_dotenv()` один раз у `create_app()`;
-змінна, уже задана в PowerShell, має пріоритет над значенням із `.env`.
+Ніколи не додавайте реальний `.env`, service-account JSON або private key до
+Git, README, screenshot чи чату.
 
-Підтримувані змінні:
-
-- Flask: `FLASK_APP`, `APP_ENV`, `SECRET_KEY`, `DEBUG`; `PORT` використовується
-  контейнерним `start.sh`, а локальний `python run.py` відкриває стандартний `5000`
-- SQLite: `DATABASE_URL`
-- таймер: `DEFAULT_TIMEZONE`, `DEFAULT_CYCLES_BEFORE_LONG_BREAK`, `POMODORO_TEST_MODE`
-- Google Calendar: `GOOGLE_CALENDAR_ID`, `GOOGLE_CALENDAR_CREDENTIALS_JSON`,
-  `GOOGLE_CALENDAR_EVENT_PREFIX`, `GOOGLE_CALENDAR_EVENT_COLOR_ID`
-- Google Sheets: `GOOGLE_SHEETS_ENABLED`, `GOOGLE_SHEETS_SPREADSHEET_ID`,
-  `GOOGLE_SHEETS_CREDENTIALS_JSON`
-
-`sqlite:///pomodoro.db` перетворюється на абсолютний шлях до
-`instance/pomodoro.db`. Google credentials передаються як JSON в один рядок;
-значення з неекранованими переносами або лапками не буде прочитане `python-dotenv`.
-
-Безпечна перевірка конфігурації без виведення секретів:
-
-```powershell
-python -c "from app import create_app; app=create_app(); keys=['GOOGLE_CALENDAR_ID','GOOGLE_CALENDAR_CREDENTIALS_JSON','POMODORO_TEST_MODE']; print({key: bool(app.config.get(key)) for key in keys})"
-```
-
-## Що важливо про перший запуск
-
-- локальна SQLite-база створюється автоматично
-- папка `instance/` використовується для локальної БД
-- схеми застосовуються автоматично під час локального старту
-- HR не потрібно вручну створювати БД або запускати окремий SQLite-клієнт
-
-## Test mode
-
-Щоб не чекати 25 хвилин, увімкніть короткий локальний режим:
+### 6. Test mode, Reset і Skip
 
 ```powershell
 $env:POMODORO_TEST_MODE="true"
 python run.py
 ```
 
-У цьому режимі:
-
-- `work` триває `10` секунд
-- `short_break` і `long_break` тривають `5` секунд
-- на головній сторінці видно кнопку `Test mode 10с / 5с`
-- біля таймера видно позначку `Test mode active`
-
-Щоб вимкнути test mode:
+У test mode `work` триває 10 секунд, а обидва break-режими — 5 секунд. Щоб
+вимкнути тимчасову змінну:
 
 ```powershell
 Remove-Item Env:POMODORO_TEST_MODE
 python run.py
 ```
 
-Його також можна ввімкнути через `.env`:
+Правила збереження:
 
-```dotenv
-POMODORO_TEST_MODE=true
-```
+- нормальне завершення countdown створює SQLite-запис;
+- `Pause` не завершує і не зберігає сесію;
+- `Reset` відкидає поточний інтервал і не створює запис;
+- `Skip` відкидає поточний інтервал, не створює запис і запускає наступний mode;
+- завершені 10-секундні test-mode `work`-сесії є повноцінними записами та
+  придатні для Calendar sync;
+- Calendar не синхронізує break-сесії, хоча нормально завершені breaks
+  зберігаються й враховуються у статистиці.
 
-Якщо значення задане і в PowerShell, і в `.env`, перемагає PowerShell. Кнопка
-короткого preset доступна лише при активному test mode. Завершені test-mode
-сесії зберігаються у `work_sessions` так само, як звичайні; `Reset` і `Skip` не
-створюють запис для поточного інтервалу, бо API викликається тільки після
-нормального завершення countdown.
+### 7. SQLite, статистика, activity calendar і CSV
 
-### Пропуск focus або break
+Локальна база за замовчуванням: `instance/pomodoro.db`. Основні таблиці:
 
-Кнопка `Skip` знаходиться поруч із `Reset` і працює для `work`, `short_break`
-та `long_break`. Вона відкидає поточний незавершений інтервал і негайно запускає
-наступний режим незалежно від `auto_start_next_session`.
+- `work_sessions` — тип, планова/фактична тривалість, UTC timestamps,
+  `client_session_id` і optional `google_calendar_event_id`;
+- `user_settings` — timer settings, timezone, theme, sound, auto-start і
+  безпечні Sheets settings;
+- `alembic_version` — поточна migration revision.
 
-- `work` -> `short_break`; пропущений focus не збільшує число completed work cycles
-- `short_break` -> `work`
-- `long_break` -> `work` і початок нового циклу
-
-Пропущена сесія не зберігається. Нормально завершені focus і break сесії
-зберігаються окремо; статистика рахує `focus_minutes`, `break_minutes` і
-`total_tracked_minutes`.
-
-## Налаштування таймера
-
-Форма налаштувань приймає тільки дозволені значення:
-
-- `work`: `15`, `25`, `30`, `45`, `60` хвилин
-- `short break`: `5`, `10`, `15` хвилин
-- `long break`: `5`, `10`, `15` хвилин
-
-Додатково зберігаються:
-
-- `cycles_before_long_break`
-- `auto_start_next_session`
-- `theme`
-- `sound_enabled`
-- `timezone`
-
-Налаштування зберігаються в SQLite і відновлюються після перезапуску.
-У формі timezone відображається як IANA-значення, наприклад `Europe/Kyiv`,
-і пояснюється, що воно використовується для daily, weekly та monthly statistics.
-Для Windows у virtualenv встановлюється `tzdata`, щоб Python `zoneinfo`
-стабільно знаходив IANA timezones.
-
-## Перевірка SQLite
-
-### Де лежить база
-
-За замовчуванням локальна база створюється тут:
-
-```text
-instance/pomodoro.db
-```
-
-### Коли вона створюється
-
-- при першому локальному запуску застосунку
-- під час старту `python run.py`, якщо SQLite-файл або таблиці ще відсутні
-
-### Які таблиці містить
-
-- `work_sessions`
-- `user_settings`
-- `alembic_version`
-
-`work_sessions` містить ID сесії, browser-generated `client_session_id`, тип,
-планову й фактичну тривалість, UTC-час початку/завершення, час створення та
-опціональний `google_calendar_event_id`. `user_settings` містить тривалості,
-цикл довгої перерви, звук, auto-start, тему й timezone. Статистика читає
-завершені сесії з `work_sessions` і групує їх за локальною датою обраної timezone.
-
-### Як швидко перевірити БД
-
-1. Запустіть застосунок через `python run.py`.
-2. За потреби увімкніть `POMODORO_TEST_MODE=true`.
-3. На головній сторінці виберіть `Test mode 10с / 5с`.
-4. Завершіть коротку `work`-сесію.
-5. Запустіть:
+Безпечна read-only перевірка:
 
 ```powershell
 python scripts/check_database.py
 ```
 
-6. Переконайтеся, що скрипт показує:
-   - кількість сесій
-   - час початку
-   - час завершення
-   - тривалість
-   - тип сесії
-   - статус синхронізації з Google Calendar
-7. Перезапустіть застосунок.
-8. Повторно запустіть `python scripts/check_database.py`.
-9. Переконайтеся, що запис не зник.
+Сторінки та export:
 
-Перевірка через Flask model:
+- `/` — timer, settings та optional integration cards;
+- `/statistics` — today/week/month totals і 7-day chart;
+- `/calendar` — month activity view та day details;
+- `/api/export/sessions.csv?timezone=Europe/Kyiv` — CSV download;
+- `/api/docs` — Swagger UI.
 
-```powershell
-python -c "from app import create_app; from app.models import WorkSession; app=create_app(); app.app_context().push(); print(WorkSession.query.order_by(WorkSession.id.desc()).limit(10).all())"
-```
+Timestamps зберігаються в UTC, а statistics, calendar, CSV і Google payloads
+перетворюються до обраної IANA timezone, наприклад `Europe/Kyiv`.
 
-Якщо окремий `sqlite3` CLI встановлено, можна також використати:
+### 8. Google Calendar: що означає блок і чому кнопка не працювала
+
+Текст `Save the latest focus session as an event` означає: взяти **останню
+завершену SQLite-сесію з `mode="work"`** і вручну створити для неї одну подію.
+Це не running/paused session, не reset/skip, не break і не вже синхронізована
+сесія.
+
+Скриншот показував точну причину неактивної кнопки: credentials і completed
+work `#63` були готові, але `GOOGLE_CALENDAR_ID` містив embed URL. Раніше backend
+повертав `calendar_id_valid=false`, тому `canSync()` залишав кнопку disabled.
+
+Тепер backend безпечно розпізнає офіційний Google Calendar embed URL, декодує
+його `src` як Calendar ID і передає до API саме нормалізований ID. Реальна
+перевірка створила Google event для work `#63` і зберегла event marker у SQLite.
+Після success кнопка знову disabled навмисно: `#63` уже synchronized. Завершіть
+нову focus-сесію — і кнопка автоматично стане активною для нового запису.
+
+Кнопка видима завжди, але активна лише за трьох одночасних умов:
 
 ```text
-sqlite3 instance/pomodoro.db
-.tables
-SELECT * FROM work_sessions ORDER BY id DESC LIMIT 10;
-.quit
+status.configured
+AND status.latest_work_session_id exists
+AND status.latest_work_session_synced is false
 ```
 
-На Windows цей CLI необов'язковий; `scripts/check_database.py` достатньо.
+| Фактична умова | Стан кнопки | Результат backend |
+| --- | --- | --- |
+| ID або credentials порожні | Disabled, `Setup required` | `400`, not configured |
+| Офіційний embed URL має `src` | Enabled за наявності unsynced work | ID автоматично декодується |
+| Інший URL, share link або HTML | Disabled, `Fix Calendar ID` | `400`, invalid Calendar ID |
+| Немає завершеної `work`-сесії | Disabled | `400`, no completed work session |
+| Остання загальна сесія — break, але раніше є work | Залежить від work | Backend вибирає останню саме `work` |
+| Є завершена unsynced work | Enabled | Спроба `events.insert()` |
+| Остання work уже має event ID | Disabled, `already synced` | `409 Conflict` при прямому API call |
+| JSON неповний/пошкоджений | Може бути enabled, бо status перевіряє наявність | Безпечний `400` під час sync |
+| API/permission/network error | Enabled до click | Безпечний `400`, secret details не повертаються |
 
-### Як безпечно видалити тестову локальну базу
+`configured=true` означає, що required values присутні й Calendar ID має
+допустиму форму. Повний JSON, Google access і sharing перевіряються лише під час
+ручного sync; застосунок не звертається до Google під час startup.
 
-Спочатку зупиніть сервер, потім:
+### 9. Google Calendar setup — короткий маршрут
+
+1. У Google Cloud створіть або виберіть project.
+2. У `APIs & Services` увімкніть **Google Calendar API**.
+3. У `IAM & Admin → Service Accounts` створіть service account.
+4. У `Keys → Add key → Create new key` завантажте JSON key.
+5. Скопіюйте `client_email` з JSON.
+6. У Google Calendar краще створіть окремий календар для Pomodoro.
+7. Відкрийте `Settings and sharing → Share with specific people or groups`,
+   додайте `client_email` і надайте **Make changes to events**.
+8. У `Integrate calendar` бажано скопіювати саме **Calendar ID**. Також можна
+   вставити повний офіційний embed URL із параметром `src`; Public URL, share
+   link і `<iframe>` не підходять.
+9. Перетворіть JSON у один рядок:
 
 ```powershell
-Remove-Item .\instance\pomodoro.db
+(Get-Content .\service-account.json -Raw |
+    ConvertFrom-Json |
+    ConvertTo-Json -Compress)
 ```
 
-Після наступного `python run.py` буде створена чиста база.
-
-## Google Calendar
-
-Проєкт не робить складну двосторонню синхронізацію. Реалізовано простий сценарій:
-
-- застосунок бере **останню завершену `work`-сесію**
-- створює для неї **одну подію** в Google Calendar
-- зберігає `google_calendar_event_id` у SQLite
-- повторна синхронізація тієї самої останньої сесії блокується
-
-### Змінні `.env` для Google Calendar
-
-```env
-GOOGLE_CALENDAR_ID=
-GOOGLE_CALENDAR_CREDENTIALS_JSON=
-GOOGLE_CALENDAR_EVENT_PREFIX=Pomodoro
-GOOGLE_CALENDAR_EVENT_COLOR_ID=
-```
-
-### Як налаштувати
-
-1. Увімкніть `Google Calendar API` у Google Cloud.
-2. Створіть `Service account`.
-3. Завантажте JSON-ключ.
-4. Поділіться потрібним Google Calendar з `client_email` цього service account.
-5. У Google Calendar відкрийте `Settings and sharing` → `Integrate calendar` і
-   скопіюйте саме `Calendar ID`. Не вставляйте embed/share URL.
-6. Перетворіть JSON у один рядок і вставте в `GOOGLE_CALENDAR_CREDENTIALS_JSON`.
-7. Вставте ID календаря в `GOOGLE_CALENDAR_ID`.
-
-Кнопка `Sync to Google Calendar` стає активною лише після коректної серверної
-конфігурації та появи завершеної `work`-сесії. Вона створює одну event для
-останнього focus, не експортує breaks і не запускається автоматично. Результат
-потрібно шукати у shared Google Calendar у час завершеної сесії. Після success
-`google_calendar_event_id` записується в SQLite, тому повторна event для тієї
-самої сесії блокується.
-
-Для цього шляху потрібні `google-api-python-client` і `google-auth`, уже вказані
-в `requirements.txt`. Якщо `import googleapiclient` не працює, достатньо
-точково виконати `pip install google-api-python-client==2.181.0`; `gspread` для
-поточної Calendar integration не використовується.
-
-### Що реально перевірено
-
-- відсутність credentials повертає зрозумілу помилку
-- успішний шлях покрито mocked-тестом
-- повторна синхронізація тієї самої останньої сесії блокується тестом
-
-### Що не перевірялося з реальним Google акаунтом у цій сесії
-
-- створення реальної події у зовнішньому календарі
-
-## Google Sheets
-
-Google Sheets є окремою опціональною інтеграцією і не замінює Google
-Calendar. Кнопка `Sync Completed Sessions` викликає
-`POST /api/integrations/google-sheets/sync` та експортує тільки завершені
-`work`-сесії.
-
-Таблиця отримує дев'ять колонок:
-
-1. `Session ID`
-2. `Date`
-3. `Start Time`
-4. `End Time`
-5. `Planned Duration`
-6. `Actual Duration`
-7. `Mode`
-8. `Timezone`
-9. `Created At`
-
-`Planned Duration` і `Actual Duration` зберігаються в секундах. Стабільний
-`client_session_id` використовується як `Session ID`: перед записом сервіс
-читає першу колонку й пропускає вже наявні ID. Якщо таблиця порожня, перша
-синхронізація створює заголовки. Якщо наявний заголовок не відповідає цьому
-формату, API повертає контрольовану помилку й нічого не дописує.
-
-У браузері зберігаються лише безпечні налаштування `Enable` і `Spreadsheet
-ID`. JSON service account залишається тільки на Flask-сервері.
-
-### Змінні `.env` для Google Sheets
-
-```env
-GOOGLE_SHEETS_ENABLED=false
-GOOGLE_SHEETS_SPREADSHEET_ID=
-GOOGLE_SHEETS_CREDENTIALS_JSON=
-```
-
-Підтримується один формат credentials: повний JSON service account в один
-рядок у `GOOGLE_SHEETS_CREDENTIALS_JSON`. Альтернативні назви змінних або
-шлях до JSON-файлу застосунок не читає.
-
-На PowerShell JSON можна стиснути однією командою:
-
-```powershell
-(Get-Content .\service-account.json -Raw | ConvertFrom-Json | ConvertTo-Json -Compress)
-```
-
-Альтернатива через Python:
+Альтернатива:
 
 ```powershell
 python -c "import json; print(json.dumps(json.load(open('service-account.json', encoding='utf-8')), separators=(',', ':')))"
 ```
 
-Вставте результат в одинарних лапках, щоб `python-dotenv` коректно прочитав
-внутрішні подвійні лапки JSON:
+10. Вставте значення тільки у локальний `.env`:
 
-```env
-GOOGLE_SHEETS_CREDENTIALS_JSON='{"type":"service_account","...":"..."}'
+```dotenv
+GOOGLE_CALENDAR_ID=your-calendar-id@group.calendar.google.com
+GOOGLE_CALENDAR_CREDENTIALS_JSON='{"type":"service_account","...":"..."}'
 ```
 
-Не вставляйте отриманий рядок у README, GitHub, чат, screenshot або browser
-form. У поточному проєкті credentials читаються тільки Flask-сервером. Після
-зміни `.env` обов’язково перезапустіть застосунок.
+11. Перезапустіть Flask, завершіть work-сесію та натисніть
+    `Sync to Google Calendar`.
 
-### Налаштування Google Cloud і таблиці
+Google Cloud IAM role сам по собі **не** відкриває особистий Calendar. Окреме
+sharing конкретного календаря з `client_email` є обов’язковим. Для work/school
+акаунтів адміністратор домену може заборонити зовнішнє sharing.
 
-1. Створіть або виберіть Google Cloud project.
-2. Увімкніть `Google Sheets API` у Google Cloud Console.
-3. Створіть service account і JSON key.
-4. Відкрийте потрібну Google Sheet, натисніть `Share` і додайте `client_email`
-   із JSON-ключа з роллю `Editor`. Domain-wide delegation для однієї
-   конкретної таблиці не потрібен.
-5. Скопіюйте ID між `/d/` і `/edit` у URL таблиці.
-6. Перетворіть JSON key в один рядок, вставте його в
-   `GOOGLE_SHEETS_CREDENTIALS_JSON`, додайте ID і встановіть
-   `GOOGLE_SHEETS_ENABLED=true`.
-7. Запустіть `flask --app run.py db upgrade`, потім `python run.py`.
-8. На головній сторінці відкрийте `Google Sheets Settings`, збережіть ID і
-   натисніть `Sync Completed Sessions`.
+Повна двомовна інструкція, troubleshooting і API flow:
+[docs/GOOGLE_INTEGRATIONS_GUIDE.md](docs/GOOGLE_INTEGRATIONS_GUIDE.md).
 
-### Що роблять дві кнопки Sheets
+### 10. Швидка Calendar-перевірка через test mode
 
-- `Save Settings` перевіряє enabled-конфігурацію та зберігає в SQLite тільки
-  checkbox і Spreadsheet ID. Ця кнопка не звертається до Google і не додає rows.
-- `Sync Completed Sessions` стає активною лише після успішного Save і готових
-  server credentials. Вона читає завершені `work`-сесії, перевіряє header A:I та
-  додає тільки відсутні `client_session_id`.
+1. Налаштуйте Google Calendar і перезапустіть Flask.
+2. Увімкніть `POMODORO_TEST_MODE=true`.
+3. Запустіть `work` та дочекайтеся повних 10 секунд.
+4. Перевірте, що Calendar card показує `ready to sync`.
+5. Натисніть `Sync to Google Calendar`.
+6. Знайдіть коротку event у shared calendar за часом цієї сесії.
+7. Повторна синхронізація тієї ж work-сесії буде заблокована.
 
-Зелений badge у UI позначає повністю опціональну частину. Помаранчевий badge
-означає «обов’язково лише тоді, коли інтеграцію ввімкнено». При disabled Sheets
-відсутні ID/credentials не є помилкою й не перевіряються.
+Test mode створює реальні локальні записи; він лише скорочує duration.
 
-### Ручна перевірка трьох станів Sheets
+### 11. Штучна завершена work-сесія без очікування
 
-1. **Disabled:** залиште три default values, запустіть Flask, завершіть Pomodoro
-   і перевірте SQLite/статистику. UI показує `Optional · Off`, Sync disabled.
-2. **Enabled, але incomplete:** встановіть `GOOGLE_SHEETS_ENABLED=true` із blank
-   ID/credentials. Flask стартує, а Save/Sync повертає контрольоване пояснення;
-   інші функції продовжують працювати.
-3. **Fully configured:** share Sheet із service-account `client_email`, збережіть
-   ID, виконайте Sync і перевірте A:I. Повторний Sync має показати skipped
-   duplicates без нових rows.
+Новий dev endpoint не потрібен: існуючий `POST /api/sessions` безпечно створює
+один завершений запис і **не** викликає Google автоматично. Запустіть Flask, а в
+іншому PowerShell:
 
-Офіційні інструкції Google: [увімкнення Sheets API та Python
-клієнт](https://developers.google.com/workspace/sheets/api/quickstart/python),
-[створення service account, JSON key і прямий доступ до конкретного
-файлу](https://developers.google.com/workspace/guides/create-credentials).
+```powershell
+$completed = [DateTimeOffset]::UtcNow
+$started = $completed.AddSeconds(-10)
+$body = @{
+  client_session_id = "calendar-test-$([guid]::NewGuid().ToString('N'))"
+  mode = "work"
+  planned_duration_seconds = 10
+  actual_duration_seconds = 10
+  started_at_utc = $started.ToString("o")
+  completed_at_utc = $completed.ToString("o")
+} | ConvertTo-Json
 
-Не комітьте `.env`, JSON key або його `private_key`. Для коду достатньо вже
-наявних `google-api-python-client` і `google-auth`; `gspread` та
-`oauth2client` не використовуються.
+$created = Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://127.0.0.1:5000/api/sessions" `
+  -ContentType "application/json" `
+  -Body $body
 
-### Чи підходить безкоштовний доступ для portfolio demo
+$created
+```
 
-Станом на 15 липня 2026 року стандартне використання Google Sheets API не має
-додаткової оплати в межах квот. Google вказує 300 read і 300 write requests за
-хвилину на project та 60 за хвилину на користувача в project; ручний експорт
-portfolio demo суттєво нижчий за ці межі. Водночас Google уже попереджає, що
-перевищення квот планують зробити платним пізніше у 2026 році, тому перед
-публічним production-запуском варто повторно перевірити [актуальні квоти й
-pricing](https://developers.google.com/workspace/sheets/api/limits).
+Якщо далі хочете натиснути саме browser button, оновіть сторінку `/`: POST з
+окремого PowerShell не генерує browser event `pomodoro:sessions-changed`.
+Прямий API sync нижче не потребує reload.
 
-### Що перевірено без реального Google акаунта
+Після цього перевірте status і синхронізуйте:
 
-- disabled integration, відсутні ID/credentials та некоректний JSON
-- mocked successful export із правильними колонками
-- пропуск повторних `Session ID`
-- експорт лише завершених `work`-сесій
-- безпечна зовнішня помилка без сирого тексту Google API
-- збереження `Enable` і `Spreadsheet ID` через frontend settings
+```powershell
+Invoke-RestMethod `
+  -Method Get `
+  -Uri "http://127.0.0.1:5000/api/integrations/google-calendar/status"
 
-Реальний запис у зовнішню Google Sheet потребує власного service account і не
-виконувався в цій сесії.
+$syncBody = @{ timezone = "Europe/Kyiv" } | ConvertTo-Json
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://127.0.0.1:5000/api/integrations/google-calendar/sync" `
+  -ContentType "application/json" `
+  -Body $syncBody
+```
 
-## CSV export
+Щоб видалити **лише локальний** тестовий запис:
 
-Кнопка `Export CSV` викликає `GET /api/export/sessions.csv`. Endpoint читає
-завершені rows із SQLite, за потреби фільтрує date range, конвертує timestamps у
-вибрану timezone й повертає `pomodoro-sessions.csv`. База при цьому не змінюється.
+```powershell
+Invoke-RestMethod `
+  -Method Delete `
+  -Uri "http://127.0.0.1:5000/api/sessions/$($created.id)"
+```
 
-## Документація для захисту
+Якщо event уже створена, DELETE локального запису не видаляє її з Google
+Calendar — видаліть event у Calendar вручну. Не видаляйте всю SQLite-базу заради
+одного тестового запису.
 
-Детальний зв’язок між файлами, класами, методами, routes, кнопками, моделями,
-Google integrations і тестами описано в
-[`docs/PROJECT_DEFENSE_GUIDE.md`](docs/PROJECT_DEFENSE_GUIDE.md). Там також є
-5–7-хвилинний виступ, live-demo checklist і відповіді на типові питання викладача.
+### 12. Google Sheets — незалежна optional-інтеграція
 
-## Команди для перевірки
+Calendar і Sheets не викликають одне одного.
+
+| Властивість | Google Calendar | Google Sheets |
+| --- | --- | --- |
+| Результат | Одна Calendar event | Нові rows A:I |
+| Джерело | Остання completed work | Усі completed work |
+| Trigger | Manual button | Manual button |
+| External resource | Shared Calendar | Shared Spreadsheet |
+| Enable rule | ID + credentials | Enable + ID + credentials |
+| Duplicate protection | Event ID у SQLite | `client_session_id` у колонці A |
+| Break export | Ні | Ні |
+| Незалежність | Працює без Sheets | Працює без Calendar |
+
+Sheets setup:
+
+1. Увімкніть **Google Sheets API** у тому самому або окремому Cloud project.
+2. Створіть Google Sheet вручну.
+3. Натисніть `Share`, додайте service-account `client_email` як **Editor** і
+   вимкніть `Notify people`, бо service account не має inbox.
+4. Скопіюйте ID між `/d/` і `/edit` у URL.
+5. Додайте one-line JSON у `GOOGLE_SHEETS_CREDENTIALS_JSON` і перезапустіть Flask.
+6. У `Google Sheets Settings` увімкніть checkbox, вставте Spreadsheet ID та
+   натисніть `Save Settings`.
+7. Натисніть `Sync Completed Sessions`.
+
+`Save Settings` зберігає лише enable flag та Spreadsheet ID у SQLite, перевіряє
+server credentials, але не додає rows. `Sync Completed Sessions` створює header
+у порожньому sheet, додає лише відсутні work-сесії й пропускає duplicates.
+
+### 13. Google notifications: точне формулювання
+
+Flask-застосунок створює event, але не реалізує push, email або browser
+notifications. Service account також не «надсилає повідомлення» користувачу.
+Після створення event саме Google Calendar застосовує особисті default/event
+notification settings: email, desktop notification або Calendar alert.
+
+Налаштуйте їх у Google Calendar:
+`Settings → Settings for my calendars → <calendar> → Event notifications`, або
+відкрийте конкретну event і додайте reminder. Browser/OS має дозволяти
+notifications для `calendar.google.com`.
+
+### 14. API для ручної перевірки
+
+| Method | URL | Body | Призначення |
+| --- | --- | --- | --- |
+| `GET` | `/api/integrations/google-calendar/status` | немає | Безпечний Calendar status |
+| `POST` | `/api/integrations/google-calendar/sync` | optional `timezone` | Sync останньої work |
+| `GET` | `/api/integrations/google-sheets/settings` | немає | Безпечні Sheets settings |
+| `PUT` | `/api/integrations/google-sheets/settings` | `enabled`, `spreadsheet_id` | Save non-secret settings |
+| `POST` | `/api/integrations/google-sheets/sync` | немає | Export completed work |
+| `POST` | `/api/sessions` | completed session payload | Створити локальну сесію |
+| `DELETE` | `/api/sessions/<id>` | немає | Видалити один локальний запис |
+
+### 15. Архітектура, файли й відповідальність
+
+| Файл | Роль |
+| --- | --- |
+| `run.py` | Створює app і запускає Flask dev server |
+| `app/__init__.py` | `create_app`, config, extensions, blueprints, SQLite bootstrap |
+| `app/config.py` | Читає env і визначає development/testing/production config |
+| `app/models/work_session.py` | SQLAlchemy-модель завершеної сесії |
+| `app/repositories/session_repository.py` | Queries, включно з latest work |
+| `app/services/session_service.py` | Validation, create/list/get/delete sessions |
+| `app/services/google_calendar_service.py` | Calendar status, payload, client, sync, duplicate guard |
+| `app/services/google_sheets_service.py` | Settings, rows, header і duplicate guard |
+| `app/blueprints/integrations/routes.py` | Calendar status/sync endpoints |
+| `app/blueprints/google_sheets/routes.py` | Sheets settings/sync endpoints |
+| `app/static/js/integrations.js` | Status, button readiness і API calls у browser |
+| `scripts/check_database.py` | Read-only SQLite inspection |
+| `tests/test_integrations_api.py` | Mocked Calendar scenarios |
+| `tests/test_google_sheets_api.py` | Mocked Sheets scenarios |
+| `.env` | Локальні secrets; не комітиться |
+| `.env.example` | Безпечний шаблон без secrets |
+
+### 16. Docker
+
+```powershell
+docker build -t pomodoro-work-tracker .
+docker run --rm `
+  -p 5000:5000 `
+  --env-file .env `
+  -v "${PWD}/instance:/app/instance" `
+  pomodoro-work-tracker
+```
+
+Volume зберігає SQLite між контейнерами. Production command у `start.sh`
+застосовує migrations і запускає Gunicorn. Не комітьте `.env` в image.
+
+### 17. Перевірки
 
 ```powershell
 python -m compileall app scripts run.py
 ruff check .
 black --check .
-flask --app run.py routes
+pytest tests/test_integrations_api.py -v
 pytest -v
+flask --app run.py routes
 python scripts/check_database.py
 ```
 
-## Docker
+Automated Google tests використовують mocks і не створюють зовнішні events або
+rows. Реальну зовнішню інтеграцію можна підтвердити лише з коректними user-owned
+resources, API access, service-account key і sharing permissions.
 
-Docker необов'язковий для локальної перевірки: найпростіший запуск —
-`python run.py`. Він корисний для повторюваного Linux-оточення й перевірки
-Gunicorn. Усі команди запускаються з кореня проєкту:
+`.github/workflows/ci.yml` автоматично запускає compileall, Ruff, Black,
+`pip check` і повний pytest на Python 3.12 для кожного push, pull request та
+ручного запуску. Бейдж `CI` угорі README показує останній GitHub Actions status.
 
-```powershell
-docker build -t pomodoro-work-tracker .
-docker run --rm -p 5000:5000 --env-file .env -e APP_ENV=production pomodoro-work-tracker
-```
+### 18. Зручність, обмеження та переваги для захисту
 
-Щоб SQLite не зникла разом із контейнером, змонтуйте `instance/` у `/app/instance`:
+Базовим timer flow користуватися просто: Google setup не потрібен, записи
+переживають restart, а test mode дає швидку демонстрацію. Google setup є
+технічнішим одноразовим кроком; найчастіша помилка — переплутати resource ID з
+URL або не поділитися resource з `client_email`.
 
-```powershell
-docker run --rm `
-  -p 5000:5000 `
-  --env-file .env `
-  -e APP_ENV=production `
-  -v "${PWD}\instance:/app/instance" `
-  pomodoro-work-tracker
-```
+Відомі обмеження:
 
-`WORKDIR` у Dockerfile — `/app`, порт — `5000`, а `start.sh` застосовує міграції
-й запускає Gunicorn. Без volume файл `/app/instance/pomodoro.db` живе лише у
-filesystem контейнера.
+- single-user застосунок без authentication;
+- countdown живе у browser, а server зберігає тільки завершення;
+- Calendar sync ручний, односторонній і лише для latest work;
+- локальне видалення не видаляє вже створену Google event;
+- Sheets export ручний і не є real-time stream;
+- Flask не реалізує Google push notifications;
+- SQLite і JSON key у `.env` придатні для local/portfolio demo, але production
+  потребує managed database, secret manager і продуманого OAuth/WIF flow.
 
-## Як працює Flask-проєкт
+Сильна сторона проєкту — поєднання Flask architecture з реальною моделлю
+optional Google Cloud integration. Під час роботи опрацьовано application
+factory, blueprints, schemas, SQLAlchemy, migrations, repositories/services,
+UTC/timezone conversion, API errors, secure env configuration, service
+accounts, Calendar/Spreadsheet sharing, external API mocks і duplicate
+protection. Це практичне знайомство не лише з Flask, а й з Google Cloud та
+Google Workspace API.
 
-1. `run.py` створює Flask-застосунок через `create_app()`.
-2. `app/__init__.py` підключає конфігурацію, розширення, маршрути й error handlers.
-3. `app/static/js/timer.js` керує активним countdown у браузері.
-4. Після завершення таймер надсилає `POST /api/sessions`.
-5. Flask зберігає завершену сесію в SQLite.
-6. `statistics.js` і `calendar.js` запитують API для оновлення статистики й календаря.
-7. `integrations.js` окремо перевіряє Calendar і Sheets readiness: Calendar
-   sync-ить latest `work`, Sheets Save зберігає safe settings, а Sheets Sync
-   експортує нові completed `work` rows.
+### 19. Документація
 
-## Використані Flask-компоненти
-
-- `Flask` — створення застосунку
-- `Blueprint` — групування сторінок і API
-- `render_template` — серверний HTML через Jinja
-- `request` — обробка HTTP-запитів усередині Flask-Smorest/Flask
-- `jsonify` — JSON-помилки й службові відповіді
-- `current_app` — доступ до конфігурації
-- `send_file` не використовується
-- `session` не використовується
-- `flash` не використовується
-
-## Структура проєкту
-
-```text
-flask_pet_project_pomodoro_timer_2026/
-├── app/
-│   ├── __init__.py
-│   ├── api/
-│   ├── blueprints/
-│   ├── models/
-│   ├── repositories/
-│   ├── services/
-│   ├── static/
-│   └── templates/
-├── docs/
-├── instance/
-├── migrations/
-├── scripts/
-│   └── check_database.py
-├── tests/
-├── .env.example
-├── AGENTS.md
-├── IMPLEMENTATION_PLAN.md
-├── README.md
-├── requirements.txt
-└── run.py
-```
-
-## Сторінки проєкту
-
-### Головна сторінка — `/`
-
-Шаблон: `app/templates/index.html`
-
-Призначення:
-
-- показує таймер
-- дає кнопки `Start`, `Pause`, `Resume`, `Reset`, `Skip`
-- показує кількість completed `work`-сесій через денну статистику
-- містить Bootstrap Carousel
-- дозволяє експортувати CSV
-- містить блок Google Calendar sync
-- містить незалежний опціональний Google Sheets settings/sync блок
-
-Ручна перевірка:
-
-1. Відкрийте `/`.
-2. Переконайтеся, що видно Carousel і перший слайд активний.
-3. Натисніть `Next`, потім `Previous`.
-4. Натисніть один з індикаторів слайда.
-5. Натисніть `Start`.
-6. Натисніть `Pause`.
-7. Натисніть `Resume`.
-8. Натисніть `Skip` і переконайтеся, що наступний режим одразу має статус `Running`.
-9. Натисніть `Reset`.
-10. Перевірте `Export CSV`.
-
-### Сторінка статистики — `/statistics`
-
-Шаблон: `app/templates/statistics.html`
-
-Призначення:
-
-- показує картки дня, тижня й місяця
-- показує 7-денний графік
-
-Ручна перевірка:
-
-1. Відкрийте `/statistics`.
-2. Переконайтеся, що картки не порожні після завершення сесії.
-3. Перевірте графік.
-
-### Сторінка календаря — `/calendar`
-
-Шаблон: `app/templates/calendar.html`
-
-Призначення:
-
-- показує активність за місяць
-- дозволяє перейти на попередній або наступний місяць
-- показує список сесій для вибраної дати
-
-Ручна перевірка:
-
-1. Відкрийте `/calendar`.
-2. Натисніть `Next`.
-3. Натисніть `Previous`.
-4. Оберіть дату.
-5. Перевірте список сесій або повідомлення про їх відсутність.
-
-## Ручна перевірка інтерфейсу
-
-| Кнопка або елемент | Де знаходиться | Дія | Очікуваний результат | Зміна в SQLite |
-| --- | --- | --- | --- | --- |
-| `Start` | `/` | натиснути | таймер починає зменшуватися, статус `Running` | без запису до завершення |
-| `Pause` | `/` | натиснути під час роботи | таймер зупиняється, `Resume` стає активною | без запису |
-| `Resume` | `/` | натиснути після паузи | countdown продовжується | без запису |
-| `Reset` | `/` | натиснути до завершення | таймер повертається у `Ready`, сесія не зберігається | без нового запису |
-| `Skip` | `/` | натиснути під час focus або break | поточний інтервал відкидається, наступний режим одразу запускається | без нового запису |
-| `Test mode 10с / 5с` | `/` | натиснути | короткий пресет стає активним | без запису |
-| `Зберегти налаштування` | `/` | змінити значення і зберегти | форма повертає повідомлення про успіх | оновлюється `user_settings` |
-| `Export CSV` | `/` | натиснути | завантажується CSV-файл | без зміни |
-| `Next` / `Previous` у календарі | `/calendar` | натиснути | змінюється місяць | без зміни |
-| вибір дати | `/calendar` | натиснути день | оновлюються деталі дня | без зміни |
-| перемикач теми | `/` | вибрати `light` або `dark` | змінюється тема інтерфейсу | оновлюється `user_settings.theme` |
-| `sound_enabled` | `/` | увімкнути / вимкнути | змінюється поведінка звуку після завершення сесії | оновлюється `user_settings.sound_enabled` |
-| Bootstrap Carousel | `/` | натиснути індикатори або `Previous` / `Next` | змінюється активний слайд | без зміни |
-| `Sync to Google Calendar` | `/` | натиснути після завершення `work`-сесії | створюється одна подія або повертається зрозуміла помилка | записується `google_calendar_event_id` |
-| Sheets `Save Settings` | `/` | disabled або повна enabled-конфігурація | зберігаються лише checkbox та Spreadsheet ID; Google request не виконується | оновлюються nullable Sheets fields у `user_settings` |
-| `Sync Completed Sessions` | `/` | натиснути після ready status | нові completed `work` rows з’являються в A:I, duplicate IDs пропускаються | SQLite не змінюється |
-
-## Що реально перевірено в цій сесії
-
-- focused integrations/pages/frontend suite — `32 passed`
-- повний `pytest -v` — `79 passed`
-- `python -m compileall app scripts run.py`
-- `ruff check .`
-- `black --check .`
-- `flask --app run.py routes`
-- `python scripts/check_database.py` — read-only перевірка знайшла `34` локальні сесії
-- `googleapiclient` і `google.auth` імпортуються, `pip check` не знаходить конфліктів
-- live HTTP smoke:
-  - `/` і `/api/health` повертають `200`
-  - `/api/integrations/google-calendar/status` контрольовано повідомляє про
-    відсутні Calendar ID і credentials
-  - sync без credentials повертає `400 validation_error`, а не падіння застосунку
-- browser smoke підтвердив завантаження `clock-face.gif`, показ анімації лише
-  під час Running і відсутність console errors
-- browser smoke підтвердив `work -> Skip -> short_break -> Skip -> work`, статус
-  `Running`, незмінний session count для пропусків і окремий облік нормально
-  завершених focus/break інтервалів
-- browser smoke на temporary SQLite підтвердив загальну `Save Settings`, Sheets
-  Save у disabled mode, контрольовану missing-credentials помилку, disabled Sync
-  до readiness, mocked click-path для обох sync-кнопок і відхилення Calendar
-  embed URL до Google request
-- фінальна desktop/dark/mobile перевірка integration cards: без horizontal
-  overflow, `0` console errors, `0` warnings
-- Dockerfile прочитано й команди звірено; image build не запускався, бо локальний
-  Docker Desktop/daemon був зупинений
-
-## Відомі обмеження
-
-- таймер активної сесії зберігається в `localStorage`, а не синхронізується між браузерами
-- реальна подія Google Calendar не створювалася в цій сесії без зовнішніх credentials
-- реальні Google Sheets rows не створювалися без зовнішніх credentials і shared spreadsheet
-- Sheets duplicate protection залежить від незмінності першої ID-колонки; для
-  великої таблиці повне читання A:I треба буде оптимізувати
-- у проєкті все ще доступний dev-маршрут `/api/docs` від Flask-Smorest, але він не потрібен для HR-перевірки
-- немає авторизації й мультикористувацького режиму
-- локальна SQLite підходить для навчання й демо, але не для серйозного production-сценарію
+- [Інструкція Google Cloud для Calendar і Sheets](docs/GOOGLE_INTEGRATIONS_GUIDE.md)
+  — Calendar, Sheets, test session, API, errors, secrets і notifications;
+- [Project Defense Guide](docs/PROJECT_DEFENSE_GUIDE.md) — архітектура та
+  сценарій захисту;
+- [API Reference](docs/API_REFERENCE.md);
+- [Deployment](docs/DEPLOYMENT.md);
+- [Current Status](docs/CURRENT_STATUS.md).

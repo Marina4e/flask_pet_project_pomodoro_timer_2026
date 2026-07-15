@@ -6,7 +6,7 @@
 | `app/models/` | SQLAlchemy models | Change when database structure changes |
 | `app/repositories/` | Database query layer | Change when query behavior changes |
 | `app/services/` | Business logic for timer, statistics, calendar, export, settings, Google Calendar, and Google Sheets | Change when behavior rules change |
-| `app/services/google_calendar_service.py` | Google Calendar status, Calendar-ID validation, safe client creation, and sync logic | Change when credentials flow, event payloads, or duplicate-sync rules change |
+| `app/services/google_calendar_service.py` | Google Calendar status, direct/embed URL ID normalization, safe client creation, and sync logic | Change when credentials flow, accepted Calendar values, event payloads, or duplicate-sync rules change |
 | `app/services/google_sheets_service.py` | Lazy optional settings, credential validation, completed-work export, header validation, and duplicate prevention | Change when Sheets credentials, columns, readiness, or sync rules change |
 | `app/blueprints/` | Page and API routes | Change when endpoints or page flows change |
 | `app/blueprints/integrations/routes.py` | Google Calendar integration endpoints | Change when sync/status contracts change |
@@ -26,8 +26,12 @@
 | `tests/` | Automated verification suite | Change when behavior changes or regressions need coverage |
 | `tests/test_google_sheets_service.py` | Disabled-startup and lazy no-client/no-credential-parsing guarantees | Change when the optional feature boundary changes |
 | `tests/test_integrations_frontend.py` | Static contracts for explicit handlers, readiness-disabled buttons, and required/optional guidance | Change when integration UI behavior changes |
-| `README.md` | User-facing setup and verification guide | Change when commands or visible behavior change |
+| `tests/test_integrations_api.py` | Calendar status/sync, test-mode work, break exclusion, duplicate protection, external-error, secret-safety, and Sheets-independence regressions | Change when Calendar behavior or response contracts change |
+| `.github/workflows/ci.yml` | Python 3.12 GitHub Actions CI for compileall, Ruff, Black, pip consistency, and pytest | Change when supported Python or quality commands change |
+| `README.md` | Ukrainian setup, usage, architecture, and verification guide; links the English README and Google Cloud guide | Change when commands or user-visible behavior change |
+| `README.en.md` | English setup, usage, architecture, and verification guide; links the Ukrainian README and Google Cloud guide | Change when commands or user-visible behavior change |
 | `IMPLEMENTATION_PLAN.md` | Current focused audit/fix plan | Change when the active implementation scope changes |
 | `spec.md` | Internal file-routing guide for future work | Change when task routing guidance changes |
 | `docs/` | Internal status, workflow, and verification notes | Change after important implementation or workflow changes |
 | `docs/PROJECT_DEFENSE_GUIDE.md` | Ukrainian teacher-defense guide grounded in current classes, routes, data flow, tests, and setup | Change whenever documented behavior or architecture changes |
+| `docs/GOOGLE_INTEGRATIONS_GUIDE.md` | Standalone bilingual Google Cloud setup guide for Pomodoro, Calendar, Sheets, runtime states, test commands, notifications, troubleshooting, security, and symbol reference | Change whenever either Google integration changes |

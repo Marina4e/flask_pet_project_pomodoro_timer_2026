@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-import re
+from urllib.parse import parse_qs, urlparse
 
 from flask import current_app
 from sqlalchemy.exc import SQLAlchemyError
@@ -15,7 +15,7 @@ from app.time_utils import to_local_datetime
 
 class GoogleCalendarService:
     CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.events"
-    CALENDAR_URL_PATTERN = re.compile(r"^https?://", re.IGNORECASE)
+    GOOGLE_CALENDAR_EMBED_HOSTS = {"calendar.google.com", "www.google.com"}
     REQUIRED_CREDENTIAL_FIELDS = (
         "type",
         "client_email",
@@ -32,22 +32,28 @@ class GoogleCalendarService:
         self.settings_service = settings_service or SettingsService()
 
     def get_status(self) -> dict[str, object]:
-        calendar_id = current_app.config["GOOGLE_CALENDAR_ID"] or None
+        configured_calendar_id = current_app.config["GOOGLE_CALENDAR_ID"] or None
+        normalized_calendar_id = self._normalize_calendar_id(configured_calendar_id)
         credentials_json = current_app.config["GOOGLE_CALENDAR_CREDENTIALS_JSON"]
         missing: list[str] = []
 
-        if not calendar_id:
+        if not configured_calendar_id:
             missing.append("GOOGLE_CALENDAR_ID")
         if not credentials_json:
             missing.append("GOOGLE_CALENDAR_CREDENTIALS_JSON")
 
-        calendar_id_valid = self._is_calendar_id_valid(calendar_id)
+        calendar_id_valid = normalized_calendar_id is not None
         latest_work_session = self.repository.get_latest_work_session()
 
         return {
             "configured": not missing and calendar_id_valid,
-            "calendar_id": calendar_id,
+            "calendar_id": normalized_calendar_id or configured_calendar_id,
             "calendar_id_valid": calendar_id_valid,
+            "calendar_id_normalized": bool(
+                normalized_calendar_id
+                and configured_calendar_id
+                and normalized_calendar_id != configured_calendar_id.strip()
+            ),
             "missing": missing,
             "latest_work_session_id": (
                 latest_work_session.id if latest_work_session is not None else None
@@ -63,8 +69,8 @@ class GoogleCalendarService:
         status = self.get_status()
         if status["calendar_id"] and not status["calendar_id_valid"]:
             raise ValidationAppError(
-                "Google Calendar ID is invalid. Use the Calendar ID from "
-                "Google Calendar settings, not an embed or sharing URL."
+                "Google Calendar ID is invalid. Use the Calendar ID or an official "
+                "Google Calendar embed URL containing src=."
             )
         if not status["configured"]:
             raise ValidationAppError(
@@ -81,7 +87,7 @@ class GoogleCalendarService:
                 "Latest completed work session is already synced",
                 details={
                     "session_id": session.id,
-                    "event_id": session.google_calendar_event_id,
+                    "sync_status": "already_synced",
                 },
             )
 
@@ -225,10 +231,30 @@ class GoogleCalendarService:
 
     @classmethod
     def _is_calendar_id_valid(cls, calendar_id: object) -> bool:
+        return cls._normalize_calendar_id(calendar_id) is not None
+
+    @classmethod
+    def _normalize_calendar_id(cls, calendar_id: object) -> str | None:
         if not isinstance(calendar_id, str) or not calendar_id.strip():
-            return False
+            return None
 
         value = calendar_id.strip()
-        return not cls.CALENDAR_URL_PATTERN.match(value) and not any(
-            character.isspace() for character in value
-        )
+        if "://" not in value:
+            if any(character.isspace() for character in value):
+                return None
+            return value
+
+        parsed = urlparse(value)
+        if (
+            parsed.scheme.lower() not in {"http", "https"}
+            or (parsed.hostname or "").lower() not in cls.GOOGLE_CALENDAR_EMBED_HOSTS
+        ):
+            return None
+
+        for source in parse_qs(parsed.query).get("src", []):
+            normalized_source = source.strip()
+            if normalized_source and not any(
+                character.isspace() for character in normalized_source
+            ):
+                return normalized_source
+        return None

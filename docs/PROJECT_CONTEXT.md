@@ -16,7 +16,9 @@ that a reviewer can inspect quickly.
 - activity calendar with day details
 - settings persistence
 - CSV export
-- simple Google Calendar sync for the latest completed work session
+- simple Google Calendar sync for the latest completed work session, using a
+  direct ID or an ID normalized from an official embed URL
+- GitHub Actions CI for compile, lint, formatting, dependency, and pytest checks
 
 ## Business Rules
 

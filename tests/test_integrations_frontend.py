@@ -41,5 +41,6 @@ def test_optional_and_required_setup_are_visually_identified():
     assert "requirement-badge-optional" in INDEX_TEMPLATE
     assert "requirement-badge-required" in INDEX_TEMPLATE
     assert "The timer, focus and break statistics" in INDEX_TEMPLATE
-    assert "Do not copy the embed URL" in INDEX_TEMPLATE
+    assert "embed URL also works" in INDEX_TEMPLATE
+    assert "status.calendar_id_normalized" in INTEGRATIONS_JS
     assert 'id="google-sheets-credentials-input"' not in INDEX_TEMPLATE
