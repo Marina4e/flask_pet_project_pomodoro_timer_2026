@@ -2,12 +2,10 @@
 
 ## Featured project video
 
-Compressed project video (8.2 MB), optimized for direct README playback.
-The personal Calendar ID is masked in the repository copy.
 
-<video controls preload="metadata" width="760" src="docs/videos/timer-project.mp4"></video>
+https://github.com/user-attachments/assets/0105cb1d-42ba-4556-83f4-5e5c607f0779
 
-[Download the featured project video](docs/videos/timer-project.mp4)
+
 
 ## Project video report
 
