@@ -2,15 +2,13 @@
 
 ## Головне відео проєкту
 
-<video controls preload="metadata" width="760" src="docs/videos/Записування pomodoro_10MB.mp4"></video>
 
-[Завантажити відео проєкту](docs/videos/Записування pomodoro_10MB.mp4)
+
+https://github.com/user-attachments/assets/0b6981b1-cb98-40b6-8114-6c2f43ea695f
+
+
 
 ## Відеозвіт про проєкт
-
-Нижче — три відео з англійською озвучкою: огляд застосунку та відповідальності
-класів, пояснення реальної SQLite-бази і демонстрація Google Sheets. У копії для
-README ідентифікатори рядків Google Sheets замасковані.
 
 <video controls preload="metadata" width="760" src="docs/videos/pomodoro-project-walkthrough.mp4"></video>
 
