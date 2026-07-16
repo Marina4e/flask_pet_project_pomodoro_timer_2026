@@ -16,6 +16,12 @@ def app(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     database_path = tmp_path / "test.db"
     monkeypatch.setenv("DATABASE_URL", f"sqlite:///{database_path.as_posix()}")
     monkeypatch.setenv("DEFAULT_TIMEZONE", "UTC")
+    monkeypatch.setenv("POMODORO_TEST_MODE", "true")
+    monkeypatch.setenv("GOOGLE_CALENDAR_ID", "")
+    monkeypatch.setenv("GOOGLE_CALENDAR_CREDENTIALS_JSON", "")
+    monkeypatch.setenv("GOOGLE_SHEETS_ENABLED", "false")
+    monkeypatch.setenv("GOOGLE_SHEETS_SPREADSHEET_ID", "")
+    monkeypatch.setenv("GOOGLE_SHEETS_CREDENTIALS_JSON", "")
     app = create_app("testing")
     app.config["DEFAULT_TIMEZONE"] = "UTC"
 

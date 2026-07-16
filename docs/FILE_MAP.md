@@ -5,19 +5,34 @@
 | `app/extensions.py` | Shared Flask extensions | Change when extensions are added or reconfigured |
 | `app/models/` | SQLAlchemy models | Change when database structure changes |
 | `app/repositories/` | Database query layer | Change when query behavior changes |
-| `app/services/` | Business logic for timer, statistics, calendar, export, settings, and Google Calendar | Change when behavior rules change |
-| `app/services/google_calendar_service.py` | Google Calendar status + sync logic | Change when credentials flow, event payloads, or duplicate-sync rules change |
+| `app/services/` | Business logic for timer, statistics, calendar, export, settings, Google Calendar, and Google Sheets | Change when behavior rules change |
+| `app/services/google_calendar_service.py` | Google Calendar status, direct/embed URL ID normalization, safe client creation, and sync logic | Change when credentials flow, accepted Calendar values, event payloads, or duplicate-sync rules change |
+| `app/services/google_sheets_service.py` | Lazy optional settings, credential validation, completed-work export, header validation, and duplicate prevention | Change when Sheets credentials, columns, readiness, or sync rules change |
 | `app/blueprints/` | Page and API routes | Change when endpoints or page flows change |
 | `app/blueprints/integrations/routes.py` | Google Calendar integration endpoints | Change when sync/status contracts change |
+| `app/blueprints/google_sheets/routes.py` | Google Sheets settings and sync endpoints | Change when Sheets API contracts change |
 | `app/api/schemas/` | Marshmallow API schemas | Change when payloads or responses change |
 | `app/templates/` | Jinja page templates and components | Change when UI structure changes |
 | `app/static/` | CSS and JavaScript assets | Change when frontend behavior or styling changes |
-| `app/static/js/timer.js` | Browser timer logic | Change when timer states or UI flow change |
-| `app/static/js/integrations.js` | Google Calendar status and sync button logic | Change when the integrations card changes |
+| `app/static/js/timer.js` | Browser timer states, countdown, skip/reset flow, persistence, and mode transitions | Change when timer states or UI flow change |
+| `app/static/js/integrations.js` | Independent Google Calendar and Google Sheets frontend flows | Change when either integrations card changes |
+| `app/templates/index.html` | Home dashboard, full-width integration guidance, and button-specific helper content | Change when homepage structure or visible workflows change |
+| `app/static/css/styles.css` and `responsive.css` | Shared theme plus desktop/mobile integration-card styling | Change when visual states or responsive layouts change |
+| `app/static/images/clock-face-static.png` | Static 3D clock for non-running timer states | Change when the timer's resting visual changes |
+| `app/static/images/clock-face.gif` | Optimized animated 3D clock for the running timer state | Change when the running visual changes |
 | `scripts/check_database.py` | Read-only SQLite inspection helper | Change when table output or verification flow changes |
 | `migrations/` | Alembic schema history | Change only when schema changes |
+| `migrations/versions/5e7a9c2d4b11_add_google_sheets_settings.py` | Nullable safe Google Sheets settings in `user_settings` | Change only through a later migration |
 | `tests/` | Automated verification suite | Change when behavior changes or regressions need coverage |
-| `README.md` | User-facing setup and verification guide | Change when commands or visible behavior change |
+| `tests/test_google_sheets_service.py` | Disabled-startup and lazy no-client/no-credential-parsing guarantees | Change when the optional feature boundary changes |
+| `tests/test_integrations_frontend.py` | Static contracts for explicit handlers, readiness-disabled buttons, and required/optional guidance | Change when integration UI behavior changes |
+| `tests/test_integrations_api.py` | Calendar status/sync, test-mode work, break exclusion, duplicate protection, external-error, secret-safety, and Sheets-independence regressions | Change when Calendar behavior or response contracts change |
+| `.github/workflows/ci.yml` | Python 3.12 GitHub Actions CI for compileall, Ruff, Black, pip consistency, and pytest | Change when supported Python or quality commands change |
+| `README.md` | Ukrainian setup, usage, architecture, and verification guide; links the English README and Google Cloud guide | Change when commands or user-visible behavior change |
+| `README.en.md` | English setup, usage, architecture, and verification guide; links the Ukrainian README and Google Cloud guide | Change when commands or user-visible behavior change |
 | `IMPLEMENTATION_PLAN.md` | Current focused audit/fix plan | Change when the active implementation scope changes |
 | `spec.md` | Internal file-routing guide for future work | Change when task routing guidance changes |
 | `docs/` | Internal status, workflow, and verification notes | Change after important implementation or workflow changes |
+| `docs/PROJECT_DEFENSE_GUIDE.md` | Ukrainian teacher-defense guide grounded in current classes, routes, data flow, tests, and setup | Change whenever documented behavior or architecture changes |
+| `docs/GOOGLE_INTEGRATIONS_GUIDE.md` | Standalone bilingual Google Cloud setup guide for Pomodoro, Calendar, Sheets, runtime states, test commands, notifications, troubleshooting, security, and symbol reference | Change whenever either Google integration changes |
+| `docs/videos/` | Featured TimerProject recording plus English-voiced MP4 reports for the application walkthrough, SQLite database, and Google Sheets export | Change when the portfolio video deliverables change |

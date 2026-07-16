@@ -11,7 +11,8 @@ from app.time_utils import get_timezone
 
 ALLOWED_THEMES = {"light", "dark", "system"}
 ALLOWED_WORK_DURATIONS = {15, 25, 30, 45, 60}
-ALLOWED_BREAK_DURATIONS = {5, 10, 15}
+ALLOWED_SHORT_BREAK_DURATIONS = {5, 10, 15}
+ALLOWED_LONG_BREAK_DURATIONS = {5, 10, 15, 25}
 
 
 class SettingsService:
@@ -102,20 +103,20 @@ class SettingsService:
                     "allowed_values": sorted(ALLOWED_WORK_DURATIONS),
                 },
             )
-        if short_break not in ALLOWED_BREAK_DURATIONS:
+        if short_break not in ALLOWED_SHORT_BREAK_DURATIONS:
             raise ValidationAppError(
                 "Invalid short-break duration",
                 details={
                     "short_break_minutes": short_break,
-                    "allowed_values": sorted(ALLOWED_BREAK_DURATIONS),
+                    "allowed_values": sorted(ALLOWED_SHORT_BREAK_DURATIONS),
                 },
             )
-        if long_break not in ALLOWED_BREAK_DURATIONS:
+        if long_break not in ALLOWED_LONG_BREAK_DURATIONS:
             raise ValidationAppError(
                 "Invalid long-break duration",
                 details={
                     "long_break_minutes": long_break,
-                    "allowed_values": sorted(ALLOWED_BREAK_DURATIONS),
+                    "allowed_values": sorted(ALLOWED_LONG_BREAK_DURATIONS),
                 },
             )
         if not min_cycles <= cycles_before_long_break <= max_cycles:

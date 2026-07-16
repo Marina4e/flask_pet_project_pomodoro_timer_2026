@@ -1,5 +1,311 @@
 # Журнал роботи
 
+## 2026-07-16 — Стисле головне відео в README
+
+### Мета
+
+Додати `TimerProject.mp4` на початок обох README у форматі, придатному для
+перегляду в репозиторії, з обмеженням розміру до 10 МБ.
+
+### Виконана робота
+
+- Джерело `D:\Desktop\TimerProject.mp4` залишено без змін.
+- Створено `docs/videos/timer-project.mp4` у форматі H.264/AAC, 960x720.
+- Розмір стисненої копії — 8.2 МБ, тривалість — приблизно 63 секунди.
+- Особистий Google Calendar ID у копії замасковано.
+- Відео додано першим блоком у `README.md` і `README.en.md` через HTML
+  `<video>` і пряме посилання на MP4.
+
+### Перевірка
+
+- `ffprobe` — PASSED: H.264, AAC, 960x720, менше 10 МБ.
+- Візуально перевірено кадри до, під час і після Google Calendar-сцени.
+
+## 2026-07-16 — Виправлення тривалості Long break
+
+### Причина
+
+Перевірка запущеного застосунку показала, що фронтенд правильно викликає
+`getDurationForMode("long_break")`, але поточний запис `user_settings` містив
+`long_break_minutes=5`. Крім того, backend schema не дозволяла зберегти 25.
+
+### Виконана робота
+
+- Змінено default `DEFAULT_LONG_BREAK_MINUTES` з 15 на 25.
+- Розділено allowed durations для short і long break; 25 додано лише для
+  long break.
+- Додано `25` у `SettingsUpdateSchema` і у visible Long break selector.
+- Поточне значення в локальній SQLite оновлено через `PUT /api/settings` до 25;
+  базу не видалено й не створено заново.
+- Додано API та frontend regression tests.
+
+### Перевірка
+
+- `GET /api/settings` / `PUT /api/settings` — PASSED.
+- Browser check: `work=25:00`, `short_break=05:00`, `long_break=25:00`.
+
+## 2026-07-16 — Відеозвіт про проєкт, SQLite і Google Sheets
+
+### Мета
+
+Підготувати три окремі відео з англійською озвучкою: огляд функцій і класів
+застосунку, пояснення локальної SQLite-бази та демонстрацію відкритої Google
+Sheets.
+
+### Виконана робота
+
+- Перевірено локальний Flask runtime на `http://127.0.0.1:5000`; для зйомки
+  запущено окремий development process без зміни application code.
+- Створено відео `docs/videos/pomodoro-project-walkthrough.mp4` з оглядом
+  dashboard, Statistics, Calendar, шарів коду та відповідальності класів.
+- Створено `docs/videos/sqlite-database-report.mp4` на основі відкритого
+  `instance/pomodoro.db` у DB Browser for SQLite.
+- Створено `docs/videos/google-sheets-export-report.mp4` на основі відкритої
+  вкладки Google Sheets у Chrome; особисті ID рядків замасковано.
+- Додано відеоплеєри й прямі посилання на всі три MP4 на початок обох README.
+- Google Sheets і SQLite залишено без записів під час зйомки.
+
+### Перевірка
+
+- `python scripts/check_database.py` — PASSED; read-only inspection, 68 work sessions.
+- Вихідні MP4 перевірено через `ffprobe`: H.264 `1280x720` і AAC audio stream.
+- Відео-кадри перевірено візуально; Google Sheets IDs у відео не читаються.
+
+## 2026-07-15 — Робочий Calendar sync і GitHub CI
+
+### Мета
+
+Зробити кнопку Calendar sync робочою з наявним official embed URL, реально
+перевірити external event creation і додати CI та badges для GitHub.
+
+### Причина
+
+- Credentials були присутні й structurally complete.
+- Latest completed focus `#63` був unsynced.
+- Старий validator відхиляв весь URL, хоча official embed URL містив правильний
+  percent-encoded Calendar ID у query parameter `src`.
+
+### Виконана робота
+
+- Додано safe normalization: direct ID проходить без змін, official Google
+  embed URL із `src` декодується, інші URL/HTML відхиляються.
+- Status schema отримала browser-safe `calendar_id_normalized`; frontend показує
+  normalized state і активує кнопку за стандартною readiness logic.
+- Реальний sync створив Google Calendar event для work `#63`, повернув link і
+  записав event marker у SQLite. Повторний sync цієї session тепер блокується.
+- Додано `.github/workflows/ci.yml` і CI/Python/Flask badges в обидва README.
+- Оновлено `.env.example`, README та Google/architecture documentation.
+
+### Перевірка
+
+- focused Calendar/frontend pytest — PASSED (`16 passed`)
+- full pytest — PASSED (`86 passed`)
+- compileall, `pip check` — PASSED
+- Ruff, Black, JavaScript syntax — PASSED
+- live safe status — configured/normalized/ready для `#63`
+- real Calendar sync — PASSED (`200`, event created, marker stored)
+- Edge headless UI — PASSED (`#63 (synced)`, already-synced message, duplicate
+  button disabled)
+
+## 2026-07-15 — Окремі український та англійський README
+
+### Мета
+
+Розділити двомовний README на два самостійні мовні файли та залишити інструкцію
+Google Cloud для Pomodoro Timer, Google Calendar і Google Sheets окремим файлом,
+на який посилаються обидва README.
+
+### Виконана робота
+
+- `README.md` залишено українською мовою.
+- Створено окремий англомовний `README.en.md` з еквівалентною структурою.
+- Обидва README отримали взаємні посилання та пряме посилання на
+  `docs/GOOGLE_INTEGRATIONS_GUIDE.md`.
+- Окрему Google-інструкцію перейменовано так, щоб назва прямо описувала setup
+  Pomodoro Timer, Google Cloud, Google Calendar і Google Sheets; у ній додано
+  посилання назад на обидва README.
+- Frontend, backend, `.env`, Google integration behavior і SQLite не змінювалися.
+
+### Перевірка
+
+- Обидва README мають по 19 numbered sections і збалансовані code fences.
+- `README.en.md` не містить кириличного контенту.
+- Усі локальні Markdown-посилання в обох README та Google guide існують.
+- `git diff --check` — PASSED; Windows line-ending warnings є інформаційними.
+- Full pytest — PASSED (`85 passed`).
+
+## 2026-07-15 — Calendar runtime debug і двомовна Google документація
+
+### Мета
+
+Точно пояснити, чому `Sync to Google Calendar` не активується, підтвердити
+normal/test-mode session rules, дати безпечну artificial-session команду й
+оформити повні українську та англійську інструкції без redesign frontend.
+
+### Діагностика
+
+- Реальний safe runtime status: Calendar ID присутній, але має URL form;
+  credentials присутні й мають required structural fields; latest completed
+  work `#53` не synchronized.
+- Frontend condition обчислюється як
+  `configured && latest_work_session_id && !latest_work_session_synced`, тому
+  invalid ID закономірно залишає кнопку disabled.
+- Real `POST /api/integrations/google-calendar/sync` повернув controlled `400`
+  про Calendar ID до побудови Google client; external write і DB mutation не
+  відбулися.
+- Handler та route правильні: `syncGoogleCalendar()` →
+  `/api/integrations/google-calendar/sync`.
+
+### Виконана робота
+
+- Додано Calendar regressions для missing ID/credentials, no session,
+  10-second work, newer break, malformed JSON safety та Sheets independence.
+- Duplicate `409` більше не повертає external Google event ID.
+- `.env.example` пояснює Calendar ID, one-line JSON і фактичну optional model.
+- `README.md` перебудовано як один equivalent Ukrainian/English документ.
+- Створено bilingual `docs/GOOGLE_INTEGRATIONS_GUIDE.md` з setup, commands,
+  API, event payload, timezone, duplicate guard, notifications, security,
+  troubleshooting, symbols, Mermaid flow та future ideas.
+- Оновлено status, changelog, work log, file map і API reference.
+
+### Перевірка на цьому етапі
+
+- focused Calendar/Sheets pytest — PASSED (`31 passed`)
+- full pytest — PASSED (`85 passed`)
+- compileall, Ruff, Black, route listing, `pip check` — PASSED
+- `python scripts/check_database.py` — PASSED, read-only, `54` sessions
+- real Calendar status endpoint — `200`
+- real Calendar sync with invalid URL-shaped ID — controlled `400`
+- live artificial-session HTTP smoke on temporary SQLite — створено 10-second
+  work, status побачив latest unsynced session, запис видалено; user DB не
+  використовувалася
+
+### Не змінено
+
+- frontend templates, CSS, JavaScript, timer UI, carousel, statistics UI,
+  calendar UI, database schema та real `.env`
+- реальний Google Calendar event не створено й не заявляється як verified
+
+### Наступний крок перевірки
+
+Після заміни URL на справжній Calendar ID користувач може створити 10-second
+work через test mode або documented `POST /api/sessions`, натиснути sync і
+перевірити external event у shared Calendar.
+
+## 2026-07-15 — Пояснення Google integration і документація для захисту
+
+### Мета
+
+Зробити Calendar/Sheets блок зі скриншота ширшим і зрозумілішим, наочно
+відокремити опціональне від обов’язкового, перевірити всі Save/Sync кнопки та
+підготувати фактичну україномовну документацію для захисту проєкту.
+
+### Виконана робота
+
+- Додано full-width integration cards із зеленими optional і помаранчевими
+  conditional-required badges, покроковими setup panels та поясненням кожної
+  кнопки.
+- Calendar відхиляє embed/share URL до побудови Google client і показує точну
+  підказку, де взяти Calendar ID.
+- Sheets зберігає лише safe browser settings; disabled mode не парсить JSON і не
+  будує client, enabled Save перевіряє ID та required service-account fields.
+- Додано readiness states, окремі explicit frontend handlers і блокування Sync
+  до успішного Save/готової конфігурації.
+- Розширено mocked tests: startup/disabled laziness, incomplete credentials,
+  incomplete session, header reuse, duplicate prevention, secret safety,
+  Calendar independence та frontend button contracts.
+- Створено `docs/PROJECT_DEFENSE_GUIDE.md` і розширено практичний README.
+
+### Перевірка
+
+- focused integration/frontend pytest — PASSED (`32 passed`)
+- full pytest — PASSED (`79 passed`)
+- compileall, Ruff, Black — PASSED
+- `node --check` — PASSED для 7 JavaScript files
+- route listing, Google imports, `pip check` — PASSED
+- read-only SQLite inspection — `34` sessions
+- Playwright temporary DB: general Save, Sheets disabled Save, enabled missing
+  credentials, Calendar/Sheets mocked sync click paths, embed URL rejection —
+  PASSED
+- desktop dark + mobile layout — no horizontal overflow
+- final browser console — `0 errors`, `0 warnings`
+
+### Не змінено
+
+- timer/Skip transitions, models, migrations, SQLite database користувача,
+  dependencies, Calendar/Sheets independence та інші сторінки
+- реальні secrets не читалися, не змінювалися й не виводилися
+- реальні Google writes і Docker image build не заявляються як перевірені
+
+## 2026-07-15 — Skip для focus і break
+
+### Мета
+
+Додати поруч із `Reset` одну кнопку `Skip`, яка працює для focus і обох break
+режимів та одразу запускає наступний countdown.
+
+### Виконана робота
+
+- Додано доступну кнопку `Skip` у timer controls без нових CSS-правил.
+- Реалізовано окремий skip transition без виклику sessions API.
+- Пропущений `work` не збільшує completed cycle count; `short_break` переходить
+  у `work`, а `long_break` починає новий цикл.
+- Наступний режим запускається негайно незалежно від auto-start setting.
+- Додано frontend regression tests і стабілізовано test fixture явним
+  `POMODORO_TEST_MODE=true`.
+
+### Перевірка
+
+- focused timer/frontend suite — PASSED (`12 passed`)
+- full pytest — PASSED (`65 passed`)
+- Playwright: skipped work і short break — `0` database rows
+- Playwright: normal work + short break — обидва режими збережені
+- statistics smoke: focus `0.17`, break `0.08`, total `0.25` minutes
+- browser console — `0 errors`, `0 warnings`
+
+### Не змінено
+
+- backend session/statistics rules, database schema та API routes
+- Google Calendar, Google Sheets, CSV, calendar views і Docker
+
+## 2026-07-15 — Google Sheets integration and 3D clock states
+
+### Мета
+
+Додати невелику опціональну Google Sheets integration поруч із наявним Google
+Calendar та замінити другий томат у таймері на виразний 3D-годинник, не
+змінюючи інші модулі проєкту.
+
+### Виконана робота
+
+- Згенеровано теплу beige/burgundy 3D-основу годинника через image generation,
+  локально додано об'ємні стрілки й тіні, створено static PNG та optimized GIF.
+- GIF фізично завантажується тільки у стані `running`; pause, completion і reset
+  видаляють `src` та показують static PNG.
+- Додано server-side Sheets service на `google-api-python-client` і
+  `google-auth`, окремі routes/schemas та контрольовані помилки.
+- Реалізовано експорт завершених `work`-сесій у дев'ять колонок і дедуплікацію
+  через наявний `client_session_id` без нової колонки в `work_sessions`.
+- Додано safe settings у `user_settings`, міграцію та compact accordion у UI;
+  credentials не потрапляють у HTML або browser storage.
+- Оновлено README, status, changelog і file map.
+
+### Перевірка
+
+- focused pytest — PASSED (`17 passed`)
+- full pytest — PASSED (`61 passed`)
+- Playwright clock flow — Ready, Running, Pause, Resume, Completed, Reset PASSED
+- Reset у live smoke не змінив кількість database sessions
+- Sheets ID/Enable save + reload — PASSED
+- missing credentials error — PASSED без raw Google details
+- final browser console — `0 errors`, `0 warnings`
+
+### Не змінено
+
+- Google Calendar service/routes і його SQLite duplicate marker
+- statistics, calendar views, CSV, Docker, authentication і timer architecture
+- `requirements.txt`, оскільки потрібні Google client libraries уже оголошені
+
 ## 2026-07-14 — Аудит, SQLite bootstrap, test mode, and Google Calendar
 
 ### Мета

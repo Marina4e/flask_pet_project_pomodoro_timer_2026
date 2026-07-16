@@ -11,6 +11,7 @@ from flask_migrate import upgrade
 from app.api.error_handlers import register_error_handlers
 from app.blueprints.calendar.routes import calendar_blp
 from app.blueprints.export.routes import export_blp
+from app.blueprints.google_sheets.routes import google_sheets_blp
 from app.blueprints.health.routes import health_blp
 from app.blueprints.integrations.routes import integrations_blp
 from app.blueprints.pages.routes import pages_bp
@@ -74,6 +75,7 @@ def _register_blueprints(app: Flask) -> None:
     api.register_blueprint(settings_blp)
     api.register_blueprint(export_blp)
     api.register_blueprint(integrations_blp)
+    api.register_blueprint(google_sheets_blp)
 
 
 def _apply_runtime_environment(app: Flask) -> None:
@@ -107,6 +109,18 @@ def _apply_runtime_environment(app: Flask) -> None:
     app.config["GOOGLE_CALENDAR_EVENT_COLOR_ID"] = os.getenv(
         "GOOGLE_CALENDAR_EVENT_COLOR_ID",
         app.config["GOOGLE_CALENDAR_EVENT_COLOR_ID"],
+    ).strip()
+    app.config["GOOGLE_SHEETS_ENABLED"] = _get_env_bool(
+        "GOOGLE_SHEETS_ENABLED",
+        app.config["GOOGLE_SHEETS_ENABLED"],
+    )
+    app.config["GOOGLE_SHEETS_SPREADSHEET_ID"] = os.getenv(
+        "GOOGLE_SHEETS_SPREADSHEET_ID",
+        app.config["GOOGLE_SHEETS_SPREADSHEET_ID"],
+    ).strip()
+    app.config["GOOGLE_SHEETS_CREDENTIALS_JSON"] = os.getenv(
+        "GOOGLE_SHEETS_CREDENTIALS_JSON",
+        app.config["GOOGLE_SHEETS_CREDENTIALS_JSON"],
     ).strip()
 
     if app.config["ENV_NAME"] == "development":

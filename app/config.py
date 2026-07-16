@@ -45,9 +45,7 @@ def _resolve_local_sqlite_uri(instance_path: str, database_uri: str) -> str:
 
 
 def _get_test_mode_flag(default: bool = False) -> bool:
-    if os.getenv("POMODORO_TEST_MODE") is not None:
-        return _get_env_bool("POMODORO_TEST_MODE", default)
-    return _get_env_bool("ENABLE_TEST_DURATIONS", default)
+    return _get_env_bool("POMODORO_TEST_MODE", default)
 
 
 class BaseConfig:
@@ -73,7 +71,7 @@ class BaseConfig:
 
     DEFAULT_WORK_DURATION_MINUTES = 25
     DEFAULT_SHORT_BREAK_MINUTES = 5
-    DEFAULT_LONG_BREAK_MINUTES = 15
+    DEFAULT_LONG_BREAK_MINUTES = 25
     DEFAULT_CYCLES_BEFORE_LONG_BREAK = _get_env_int(
         "DEFAULT_CYCLES_BEFORE_LONG_BREAK", 4
     )
@@ -90,6 +88,12 @@ class BaseConfig:
     GOOGLE_CALENDAR_EVENT_PREFIX = os.getenv("GOOGLE_CALENDAR_EVENT_PREFIX", "Pomodoro")
     GOOGLE_CALENDAR_EVENT_COLOR_ID = os.getenv(
         "GOOGLE_CALENDAR_EVENT_COLOR_ID", ""
+    ).strip()
+
+    GOOGLE_SHEETS_ENABLED = _get_env_bool("GOOGLE_SHEETS_ENABLED", False)
+    GOOGLE_SHEETS_SPREADSHEET_ID = os.getenv("GOOGLE_SHEETS_SPREADSHEET_ID", "").strip()
+    GOOGLE_SHEETS_CREDENTIALS_JSON = os.getenv(
+        "GOOGLE_SHEETS_CREDENTIALS_JSON", ""
     ).strip()
 
 

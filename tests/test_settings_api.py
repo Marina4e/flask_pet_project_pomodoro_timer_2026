@@ -9,6 +9,7 @@ def test_get_settings(client):
     assert payload["theme"] == "system"
     assert payload["timezone"] == "UTC"
     assert payload["cycles_before_long_break"] == 4
+    assert payload["long_break_minutes"] == 25
     assert payload["auto_start_next_session"] is True
     assert payload["test_mode_enabled"] is True
 
@@ -54,6 +55,25 @@ def test_update_settings_trims_timezone(client):
 
     assert response.status_code == 200
     assert response.get_json()["timezone"] == "Europe/Kyiv"
+
+
+def test_update_settings_accepts_25_minute_long_break(client):
+    response = client.put(
+        "/api/settings",
+        json={
+            "work_duration_minutes": 25,
+            "short_break_minutes": 5,
+            "long_break_minutes": 25,
+            "cycles_before_long_break": 4,
+            "sound_enabled": True,
+            "auto_start_next_session": True,
+            "theme": "system",
+            "timezone": "UTC",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()["long_break_minutes"] == 25
 
 
 def test_invalid_settings_returns_400(client):
