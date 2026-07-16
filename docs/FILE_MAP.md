@@ -35,4 +35,4 @@
 | `docs/` | Internal status, workflow, and verification notes | Change after important implementation or workflow changes |
 | `docs/PROJECT_DEFENSE_GUIDE.md` | Ukrainian teacher-defense guide grounded in current classes, routes, data flow, tests, and setup | Change whenever documented behavior or architecture changes |
 | `docs/GOOGLE_INTEGRATIONS_GUIDE.md` | Standalone bilingual Google Cloud setup guide for Pomodoro, Calendar, Sheets, runtime states, test commands, notifications, troubleshooting, security, and symbol reference | Change whenever either Google integration changes |
-| `docs/videos/` | English-voiced MP4 reports for the application walkthrough, SQLite database, and Google Sheets export | Change when the portfolio video deliverables change |
+| `docs/videos/` | Featured TimerProject recording plus English-voiced MP4 reports for the application walkthrough, SQLite database, and Google Sheets export | Change when the portfolio video deliverables change |

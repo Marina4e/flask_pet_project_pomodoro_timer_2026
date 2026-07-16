@@ -1,5 +1,14 @@
 # Pomodoro Work Tracker
 
+## Featured project video
+
+Compressed project video (8.2 MB), optimized for direct README playback.
+The personal Calendar ID is masked in the repository copy.
+
+<video controls preload="metadata" width="760" src="docs/videos/timer-project.mp4"></video>
+
+[Download the featured project video](docs/videos/timer-project.mp4)
+
 ## Project video report
 
 These three videos have English voice-over: an application and class
@@ -55,6 +64,8 @@ tests, and Docker. It is not presented as an enterprise or multi-user SaaS.
 
 - `Start`, `Pause`, `Resume`, `Reset`, and `Skip` for `work`, `short_break`, and
   `long_break`;
+- standard durations are 25 minutes for `work`, 5 minutes for `short_break`,
+  and 25 minutes for `long_break`;
 - automatic focus/break transitions and optional auto-start;
 - active countdown recovery after reload through `localStorage`;
 - storage of normally completed focus and break sessions in SQLite;

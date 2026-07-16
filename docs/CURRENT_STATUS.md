@@ -206,6 +206,29 @@
   already-in-Calendar explanation, and the sync button disabled against a
   duplicate.
 
+## 2026-07-16 Long Break Duration Fix
+
+- Confirmed the reported behavior against the running app: `GET /api/settings`
+  returned `work=25`, `short=5`, and the persisted `long=5`.
+- The frontend mapping was correct; it used the saved `long_break_minutes` value.
+- Changed the new default long-break duration to 25 minutes, allowed 25 in the
+  API schema and service validation, and added 25 to the settings selector.
+- Updated the current local `user_settings` row to `long_break_minutes=25`
+  through the existing settings API without deleting or recreating SQLite.
+- Browser verification now returns `25:00` for `long_break`, `05:00` for
+  `short_break`, and `25:00` for `work`.
+
+## 2026-07-16 Featured TimerProject Video
+
+- Compressed `D:\Desktop\TimerProject.mp4` into
+  `docs/videos/timer-project.mp4` without modifying the Desktop source file.
+- The repository copy is H.264/AAC, 960x720, 63 seconds, and 8.2 MB, below the
+  requested 10 MB limit.
+- Added the featured video player and direct download link before the other
+  video reports in both `README.md` and `README.en.md`.
+- Masked the personal Google Calendar ID visible in the source recording before
+  publishing the repository copy.
+
 ## 2026-07-16 English Video Reports
 
 - Added three narrated MP4 reports under `docs/videos/`:

@@ -1,5 +1,49 @@
 # Журнал роботи
 
+## 2026-07-16 — Стисле головне відео в README
+
+### Мета
+
+Додати `TimerProject.mp4` на початок обох README у форматі, придатному для
+перегляду в репозиторії, з обмеженням розміру до 10 МБ.
+
+### Виконана робота
+
+- Джерело `D:\Desktop\TimerProject.mp4` залишено без змін.
+- Створено `docs/videos/timer-project.mp4` у форматі H.264/AAC, 960x720.
+- Розмір стисненої копії — 8.2 МБ, тривалість — приблизно 63 секунди.
+- Особистий Google Calendar ID у копії замасковано.
+- Відео додано першим блоком у `README.md` і `README.en.md` через HTML
+  `<video>` і пряме посилання на MP4.
+
+### Перевірка
+
+- `ffprobe` — PASSED: H.264, AAC, 960x720, менше 10 МБ.
+- Візуально перевірено кадри до, під час і після Google Calendar-сцени.
+
+## 2026-07-16 — Виправлення тривалості Long break
+
+### Причина
+
+Перевірка запущеного застосунку показала, що фронтенд правильно викликає
+`getDurationForMode("long_break")`, але поточний запис `user_settings` містив
+`long_break_minutes=5`. Крім того, backend schema не дозволяла зберегти 25.
+
+### Виконана робота
+
+- Змінено default `DEFAULT_LONG_BREAK_MINUTES` з 15 на 25.
+- Розділено allowed durations для short і long break; 25 додано лише для
+  long break.
+- Додано `25` у `SettingsUpdateSchema` і у visible Long break selector.
+- Поточне значення в локальній SQLite оновлено через `PUT /api/settings` до 25;
+  базу не видалено й не створено заново.
+- Додано API та frontend regression tests.
+
+### Перевірка
+
+- `GET /api/settings` / `PUT /api/settings` — PASSED.
+- Browser check: `work=25:00`, `short_break=05:00`, `long_break=25:00`.
+
 ## 2026-07-16 — Відеозвіт про проєкт, SQLite і Google Sheets
 
 ### Мета

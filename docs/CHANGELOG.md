@@ -364,3 +364,39 @@
 - `pomodoro-project-walkthrough.mp4` — approximately 2:15.
 - `sqlite-database-report.mp4` — approximately 1:34.
 - `google-sheets-export-report.mp4` — approximately 1:33.
+
+## 2026-07-16 — Long Break duration fix
+
+### Fixed
+
+- Changed the standard `long_break` duration from the previous default to 25
+  minutes so the timer now matches the requested `25 / 5 / 25` setup.
+- Allowed 25-minute long breaks in the Marshmallow API schema and
+  `SettingsService` validation.
+- Added the 25-minute option to the visible settings selector.
+- Updated the existing local settings row through `PUT /api/settings`; the
+  SQLite database was not deleted or recreated.
+
+### Verified
+
+- API settings response: `work=25`, `short=5`, `long=25`.
+- Browser mode checks: Work `25:00`, Short break `05:00`, Long break `25:00`.
+
+## 2026-07-16 — Featured TimerProject video
+
+### Added
+
+- Added `docs/videos/timer-project.mp4` as the first featured video in both
+  README files.
+- Compressed the 63-second source recording from 25.7 MB to 8.2 MB using
+  960x720 H.264/AAC encoding.
+
+### Changed
+
+- Masked the personal Calendar ID visible in the source recording. The Desktop
+  source file was not modified.
+
+### Verified
+
+- `ffprobe` confirms H.264 video, AAC audio, 960x720 resolution, and a file size
+  below 10 MB.

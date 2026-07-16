@@ -48,3 +48,9 @@ def test_skip_supports_breaks_and_is_bound_to_button():
         transition_function
     )
     assert 'elements.skip.addEventListener("click", skipTimer)' in TIMER_JS
+
+
+def test_long_break_settings_include_25_minutes():
+    assert '<option value="25">25</option>' in (
+        PROJECT_ROOT / "app/templates/components/settings_panel.html"
+    ).read_text(encoding="utf-8")

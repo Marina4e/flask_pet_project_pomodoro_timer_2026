@@ -1,5 +1,14 @@
 # Pomodoro Work Tracker
 
+## Головне відео проєкту
+
+Стисла копія відео проєкту (8,2 МБ), оптимізована для перегляду в README.
+Особистий Calendar ID у відео замаскований.
+
+<video controls preload="metadata" width="760" src="docs/videos/timer-project.mp4"></video>
+
+[Завантажити відео проєкту](docs/videos/timer-project.mp4)
+
 ## Відеозвіт про проєкт
 
 Нижче — три відео з англійською озвучкою: огляд застосунку та відповідальності
@@ -53,6 +62,8 @@ Docker. Він не позиціонується як enterprise або multi-us
 
 - `Start`, `Pause`, `Resume`, `Reset` і `Skip` для `work`, `short_break` та
   `long_break`;
+- стандартні тривалості: `work` — 25 хвилин, `short_break` — 5 хвилин,
+  `long_break` — 25 хвилин;
 - автоматичний перехід між focus і break, а також опціональний auto-start;
 - відновлення активного countdown після reload через `localStorage`;
 - збереження нормально завершених focus і break-сесій у SQLite;

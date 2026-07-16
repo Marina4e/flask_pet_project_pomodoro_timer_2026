@@ -26,7 +26,7 @@ class SettingsUpdateSchema(Schema):
     )
     long_break_minutes = fields.Int(
         required=True,
-        validate=validate.OneOf([5, 10, 15]),
+        validate=validate.OneOf([5, 10, 15, 25]),
     )
     cycles_before_long_break = fields.Int(
         required=True,
