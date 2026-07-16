@@ -2,12 +2,9 @@
 
 ## Головне відео проєкту
 
-Стисла копія відео проєкту (8,2 МБ), оптимізована для перегляду в README.
-Особистий Calendar ID у відео замаскований.
+<video controls preload="metadata" width="760" src="docs/videos/Записування pomodoro_10MB.mp4"></video>
 
-<video controls preload="metadata" width="760" src="docs/videos/timer-project.mp4"></video>
-
-[Завантажити відео проєкту](docs/videos/timer-project.mp4)
+[Завантажити відео проєкту](docs/videos/Записування pomodoro_10MB.mp4)
 
 ## Відеозвіт про проєкт
 
