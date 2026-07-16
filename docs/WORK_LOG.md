@@ -1,5 +1,32 @@
 # Журнал роботи
 
+## 2026-07-16 — Відеозвіт про проєкт, SQLite і Google Sheets
+
+### Мета
+
+Підготувати три окремі відео з англійською озвучкою: огляд функцій і класів
+застосунку, пояснення локальної SQLite-бази та демонстрацію відкритої Google
+Sheets.
+
+### Виконана робота
+
+- Перевірено локальний Flask runtime на `http://127.0.0.1:5000`; для зйомки
+  запущено окремий development process без зміни application code.
+- Створено відео `docs/videos/pomodoro-project-walkthrough.mp4` з оглядом
+  dashboard, Statistics, Calendar, шарів коду та відповідальності класів.
+- Створено `docs/videos/sqlite-database-report.mp4` на основі відкритого
+  `instance/pomodoro.db` у DB Browser for SQLite.
+- Створено `docs/videos/google-sheets-export-report.mp4` на основі відкритої
+  вкладки Google Sheets у Chrome; особисті ID рядків замасковано.
+- Додано відеоплеєри й прямі посилання на всі три MP4 на початок обох README.
+- Google Sheets і SQLite залишено без записів під час зйомки.
+
+### Перевірка
+
+- `python scripts/check_database.py` — PASSED; read-only inspection, 68 work sessions.
+- Вихідні MP4 перевірено через `ffprobe`: H.264 `1280x720` і AAC audio stream.
+- Відео-кадри перевірено візуально; Google Sheets IDs у відео не читаються.
+
 ## 2026-07-15 — Робочий Calendar sync і GitHub CI
 
 ### Мета

@@ -206,6 +206,26 @@
   already-in-Calendar explanation, and the sync button disabled against a
   duplicate.
 
+## 2026-07-16 English Video Reports
+
+- Added three narrated MP4 reports under `docs/videos/`:
+  `pomodoro-project-walkthrough.mp4`, `sqlite-database-report.mp4`, and
+  `google-sheets-export-report.mp4`.
+- The first video explains the browser-to-Flask-to-SQLite flow and the roles of
+  `create_app`, `PomodoroTimerService`, the SQLAlchemy models, repositories,
+  services, and Google integration services.
+- The second video shows the real `instance/pomodoro.db` structure in DB Browser
+  for SQLite and explains the three tables, indexes, models, and read-only
+  inspection path.
+- The third video shows the current Google Sheets export view from Chrome with
+  row identifiers masked in the portfolio copy; no Sheet or SQLite data was
+  changed while capturing the source screens.
+- Both README files now place the three videos at the beginning with local MP4
+  links and HTML video players.
+- Temporary screenshots, narration WAV files, and render scripts are kept only
+  in the local working area during production and are not part of the README
+  deliverable.
+
 ## Known Limitations
 
 - real Google Sheets writes were not tested with external credentials in this session
@@ -218,4 +238,4 @@
 
 ## Last Update Date
 
-- 2026-07-15
+- 2026-07-16

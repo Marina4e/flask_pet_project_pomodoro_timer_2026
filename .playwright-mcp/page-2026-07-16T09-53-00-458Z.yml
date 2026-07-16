@@ -1,0 +1,65 @@
+- generic [ref=f1e2]:
+  - banner [ref=f1e3]:
+    - generic [ref=f1e4]:
+      - generic [ref=f1e5]:
+        - paragraph [ref=f1e6]: Flask Portfolio Project
+        - link "Pomodoro Work Tracker" [ref=f1e7] [cursor=pointer]:
+          - /url: /
+      - navigation "Main navigation" [ref=f1e8]:
+        - generic [ref=f1e9]:
+          - link "Home" [ref=f1e10] [cursor=pointer]:
+            - /url: /
+          - link "Statistics" [ref=f1e11] [cursor=pointer]:
+            - /url: /statistics
+          - link "Calendar" [ref=f1e12] [cursor=pointer]:
+            - /url: /calendar
+  - main [ref=f1e13]:
+    - generic [ref=f1e15]:
+      - paragraph [ref=f1e16]: Statistics Dashboard
+      - heading "Productivity Statistics" [level=1] [ref=f1e17]
+      - paragraph [ref=f1e18]: Compare focus sessions for today, this week, and this month, then review the last seven days on the chart.
+    - generic [ref=f1e19]:
+      - region "Productivity statistics" [ref=f1e20]:
+        - article [ref=f1e21]:
+          - generic [ref=f1e22]:
+            - paragraph [ref=f1e23]: Today
+            - paragraph [ref=f1e24]: 0.00 h
+            - paragraph [ref=f1e25]: Focus time today
+            - paragraph [ref=f1e26]:
+              - generic [ref=f1e27]: 0 min
+              - generic [ref=f1e28]: "-"
+        - article [ref=f1e29]:
+          - generic [ref=f1e30]:
+            - paragraph [ref=f1e31]: This Week
+            - paragraph [ref=f1e32]: 0.00 h
+            - paragraph [ref=f1e33]: Focus time this week
+            - paragraph [ref=f1e34]:
+              - generic [ref=f1e35]: 0 min
+              - generic [ref=f1e36]: "-"
+        - article [ref=f1e37]:
+          - generic [ref=f1e38]:
+            - paragraph [ref=f1e39]: This Month
+            - paragraph [ref=f1e40]: 0.00 h
+            - paragraph [ref=f1e41]: Focus time this month
+            - paragraph [ref=f1e42]:
+              - generic [ref=f1e43]: 0 min
+              - generic [ref=f1e44]: "-"
+        - article [ref=f1e45]:
+          - generic [ref=f1e46]:
+            - paragraph [ref=f1e47]: Completed Pomodoros
+            - paragraph [ref=f1e48]: "0"
+            - paragraph [ref=f1e49]: Completed work sessions today
+            - paragraph [ref=f1e50]:
+              - generic [ref=f1e51]: Work sessions
+              - generic [ref=f1e52]: Today
+      - article [ref=f1e53]:
+        - generic [ref=f1e54]:
+          - generic [ref=f1e55]:
+            - paragraph [ref=f1e56]: Seven-Day Productivity
+            - heading "Activity Trend" [level=2] [ref=f1e57]
+          - generic [ref=f1e58]:
+            - generic [ref=f1e59]: Europe/Kyiv
+            - button "Show chart" [ref=f1e60] [cursor=pointer]
+  - contentinfo [ref=f1e61]:
+    - paragraph [ref=f1e62]: Bootstrap 5.3, Flask, SQLite, Vanilla JS, Chart.js, optional Google Calendar sync.
+    - paragraph [ref=f1e63]: © 2026 Pomodoro Work Tracker

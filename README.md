@@ -1,5 +1,23 @@
 # Pomodoro Work Tracker
 
+## Відеозвіт про проєкт
+
+Нижче — три відео з англійською озвучкою: огляд застосунку та відповідальності
+класів, пояснення реальної SQLite-бази і демонстрація Google Sheets. У копії для
+README ідентифікатори рядків Google Sheets замасковані.
+
+<video controls preload="metadata" width="760" src="docs/videos/pomodoro-project-walkthrough.mp4"></video>
+
+[Завантажити відео 1: project walkthrough](docs/videos/pomodoro-project-walkthrough.mp4)
+
+<video controls preload="metadata" width="760" src="docs/videos/sqlite-database-report.mp4"></video>
+
+[Завантажити відео 2: SQLite database report](docs/videos/sqlite-database-report.mp4)
+
+<video controls preload="metadata" width="760" src="docs/videos/google-sheets-export-report.mp4"></video>
+
+[Завантажити відео 3: Google Sheets export report](docs/videos/google-sheets-export-report.mp4)
+
 [![CI](https://github.com/Marina4e/flask_pet_project_pomodoro_timer_2026/actions/workflows/ci.yml/badge.svg)](https://github.com/Marina4e/flask_pet_project_pomodoro_timer_2026/actions/workflows/ci.yml)
 ![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)
 ![Flask 3.1](https://img.shields.io/badge/Flask-3.1-000000?logo=flask&logoColor=white)

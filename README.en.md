@@ -1,5 +1,24 @@
 # Pomodoro Work Tracker
 
+## Project video report
+
+These three videos have English voice-over: an application and class
+responsibility walkthrough, a report about the real SQLite database, and a
+Google Sheets export demonstration. Google Sheets row identifiers are masked in
+the README copy.
+
+<video controls preload="metadata" width="760" src="docs/videos/pomodoro-project-walkthrough.mp4"></video>
+
+[Download video 1: project walkthrough](docs/videos/pomodoro-project-walkthrough.mp4)
+
+<video controls preload="metadata" width="760" src="docs/videos/sqlite-database-report.mp4"></video>
+
+[Download video 2: SQLite database report](docs/videos/sqlite-database-report.mp4)
+
+<video controls preload="metadata" width="760" src="docs/videos/google-sheets-export-report.mp4"></video>
+
+[Download video 3: Google Sheets export report](docs/videos/google-sheets-export-report.mp4)
+
 [![CI](https://github.com/Marina4e/flask_pet_project_pomodoro_timer_2026/actions/workflows/ci.yml/badge.svg)](https://github.com/Marina4e/flask_pet_project_pomodoro_timer_2026/actions/workflows/ci.yml)
 ![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)
 ![Flask 3.1](https://img.shields.io/badge/Flask-3.1-000000?logo=flask&logoColor=white)

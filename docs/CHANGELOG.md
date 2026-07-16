@@ -342,3 +342,25 @@
 - Full suite — `86 passed`; compileall and `pip check` passed.
 - Edge headless rendered `#63 (synced)`, the already-synced message, and the
   expected duplicate-protection disabled button.
+
+## 2026-07-16 — English video reports
+
+### Added
+
+- Added three English-voiced MP4 reports in `docs/videos/` covering the
+  application architecture, the real SQLite database, and Google Sheets export.
+- Added video players and direct MP4 links at the beginning of `README.md` and
+  `README.en.md`.
+
+### Changed
+
+- The Google Sheets capture used in the portfolio videos masks row identifiers
+  and excludes the browser address bar; the source Sheet and local SQLite data
+  were not modified.
+
+### Verified
+
+- MP4 outputs are H.264 video at `1280x720` with AAC English narration.
+- `pomodoro-project-walkthrough.mp4` — approximately 2:15.
+- `sqlite-database-report.mp4` — approximately 1:34.
+- `google-sheets-export-report.mp4` — approximately 1:33.

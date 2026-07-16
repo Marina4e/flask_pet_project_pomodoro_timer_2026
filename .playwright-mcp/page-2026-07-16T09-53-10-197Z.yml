@@ -1,0 +1,313 @@
+- generic [ref=f3e2]:
+  - banner [ref=f3e3]:
+    - generic [ref=f3e4]:
+      - generic [ref=f3e5]:
+        - paragraph [ref=f3e6]: Flask Portfolio Project
+        - link "Pomodoro Work Tracker" [ref=f3e7] [cursor=pointer]:
+          - /url: /
+      - navigation "Main navigation" [ref=f3e8]:
+        - generic [ref=f3e9]:
+          - link "Home" [ref=f3e10] [cursor=pointer]:
+            - /url: /
+          - link "Statistics" [ref=f3e11] [cursor=pointer]:
+            - /url: /statistics
+          - link "Calendar" [ref=f3e12] [cursor=pointer]:
+            - /url: /calendar
+  - main [ref=f3e13]:
+    - generic "Pomodoro Work Tracker sections" [ref=f3e15]:
+      - generic [ref=f3e16]:
+        - button "Pomodoro Timer" [ref=f3e17] [cursor=pointer]
+        - button "Statistics" [ref=f3e18] [cursor=pointer]
+        - button "Calendar" [ref=f3e19] [cursor=pointer]
+        - button "Settings" [ref=f3e20] [cursor=pointer]
+        - button "Google Calendar" [ref=f3e21] [cursor=pointer]
+      - generic [ref=f3e26]:
+        - img "Pomodoro tomato timer" [ref=f3e28]
+        - generic [ref=f3e30]:
+          - paragraph [ref=f3e31]: Dashboard section
+          - heading "Pomodoro Timer" [level=1] [ref=f3e32]
+          - paragraph [ref=f3e33]: Start focused work intervals, pause when needed, and save completed sessions to SQLite.
+          - paragraph [ref=f3e34]:
+            - link "Open Timer" [ref=f3e35] [cursor=pointer]:
+              - /url: /#timer-widget
+      - button "Previous" [ref=f3e36] [cursor=pointer]
+      - button "Next" [ref=f3e39] [cursor=pointer]
+    - article [ref=f3e43]:
+      - generic [ref=f3e44]:
+        - generic [ref=f3e45]:
+          - paragraph [ref=f3e46]: Timer
+          - heading "Pomodoro Timer" [level=2] [ref=f3e47]
+        - generic [ref=f3e48]: Idle
+      - generic [ref=f3e53]:
+        - paragraph [ref=f3e54]:
+          - text: Press
+          - strong [ref=f3e55]: Start
+          - text: to begin a focus interval. The completed session is saved automatically through the Flask API.
+        - generic [ref=f3e56]:
+          - generic [ref=f3e57]: "Session #1"
+          - generic [ref=f3e58]: "Next: short break"
+      - group "Timer presets" [ref=f3e59]:
+        - button "Standard 25/5" [ref=f3e60] [cursor=pointer]
+        - button "Test mode 10s / 5s" [ref=f3e61] [cursor=pointer]
+      - group "Timer modes" [ref=f3e62]:
+        - button "Work" [ref=f3e63] [cursor=pointer]
+        - button "Short break" [ref=f3e64] [cursor=pointer]
+        - button "Long break" [ref=f3e65] [cursor=pointer]
+      - paragraph [ref=f3e66]:
+        - text: "Current duration:"
+        - strong [ref=f3e67]: 25 min
+      - generic [ref=f3e68]: 25:00
+      - paragraph [ref=f3e70]: The timer saves the completed session automatically through Flask API.
+      - generic [ref=f3e71]:
+        - button "Start" [ref=f3e72] [cursor=pointer]
+        - button "Pause" [ref=f3e73] [cursor=pointer]
+        - button "Resume" [ref=f3e74] [cursor=pointer]
+        - button "Reset" [ref=f3e75] [cursor=pointer]
+        - button "Skip current focus or break" [ref=f3e76] [cursor=pointer]: Skip
+        - link "Export CSV" [ref=f3e77] [cursor=pointer]:
+          - /url: /api/export/sessions.csv
+    - generic [ref=f3e78]:
+      - region "Productivity statistics" [ref=f3e79]:
+        - article [ref=f3e80]:
+          - generic [ref=f3e81]:
+            - paragraph [ref=f3e82]: Today
+            - paragraph [ref=f3e83]: 0.00 h
+            - paragraph [ref=f3e84]: Focus time today
+            - paragraph [ref=f3e85]:
+              - generic [ref=f3e86]: 0 min
+              - generic [ref=f3e87]: "-"
+        - article [ref=f3e88]:
+          - generic [ref=f3e89]:
+            - paragraph [ref=f3e90]: This Week
+            - paragraph [ref=f3e91]: 0.00 h
+            - paragraph [ref=f3e92]: Focus time this week
+            - paragraph [ref=f3e93]:
+              - generic [ref=f3e94]: 0 min
+              - generic [ref=f3e95]: "-"
+        - article [ref=f3e96]:
+          - generic [ref=f3e97]:
+            - paragraph [ref=f3e98]: This Month
+            - paragraph [ref=f3e99]: 0.00 h
+            - paragraph [ref=f3e100]: Focus time this month
+            - paragraph [ref=f3e101]:
+              - generic [ref=f3e102]: 0 min
+              - generic [ref=f3e103]: "-"
+        - article [ref=f3e104]:
+          - generic [ref=f3e105]:
+            - paragraph [ref=f3e106]: Completed Pomodoros
+            - paragraph [ref=f3e107]: "0"
+            - paragraph [ref=f3e108]: Completed work sessions today
+            - paragraph [ref=f3e109]:
+              - generic [ref=f3e110]: Work sessions
+              - generic [ref=f3e111]: Today
+      - article [ref=f3e112]:
+        - generic [ref=f3e113]:
+          - generic [ref=f3e114]:
+            - paragraph [ref=f3e115]: Seven-Day Productivity
+            - heading "Productivity trend" [level=2] [ref=f3e116]
+          - generic [ref=f3e117]:
+            - generic [ref=f3e118]: Europe/Kyiv
+            - button "Show chart" [ref=f3e119] [cursor=pointer]
+    - article [ref=f3e121]:
+      - generic [ref=f3e123]:
+        - paragraph [ref=f3e124]: Settings
+        - heading "Timer Settings" [level=2] [ref=f3e125]
+      - generic [ref=f3e126]:
+        - generic [ref=f3e127]:
+          - generic [ref=f3e128]:
+            - generic [ref=f3e129]: Work duration
+            - combobox "Work duration" [ref=f3e130]:
+              - option "15" [selected]
+              - option "25"
+              - option "30"
+              - option "45"
+              - option "60"
+          - generic [ref=f3e131]:
+            - generic [ref=f3e132]: Short break
+            - combobox "Short break" [ref=f3e133]:
+              - option "5" [selected]
+              - option "10"
+              - option "15"
+          - generic [ref=f3e134]:
+            - generic [ref=f3e135]: Long break
+            - combobox "Long break" [ref=f3e136]:
+              - option "5" [selected]
+              - option "10"
+              - option "15"
+          - generic [ref=f3e137]:
+            - generic [ref=f3e138]: Timezone
+            - textbox "Timezone" [ref=f3e139]:
+              - /placeholder: Europe/Kyiv
+              - text: Europe/Kyiv
+            - text: Used for daily, weekly, and monthly statistics. Enter an IANA timezone such as Europe/Kyiv.
+            - generic [ref=f3e140]:
+              - text: "Active timezone:"
+              - status [ref=f3e141]: Europe/Kyiv
+        - heading [level=3] [ref=f3e144]:
+          - button "Advanced Settings" [ref=f3e145] [cursor=pointer]
+        - generic [ref=f3e146]:
+          - button "Save Settings" [ref=f3e147] [cursor=pointer]
+          - status [ref=f3e148]: Settings are stored locally and used by the timer and statistics.
+    - region [ref=f3e149]:
+      - article [ref=f3e150]:
+        - generic [ref=f3e151]:
+          - paragraph [ref=f3e152]: Optional Google connections
+          - heading "Keep time in SQLite first, then send a copy to Google" [level=2] [ref=f3e153]
+          - paragraph [ref=f3e154]: The timer, focus and break statistics, activity calendar, and CSV export work without either Google integration. Connect only the service you actually need.
+        - generic "Setup legend" [ref=f3e155]:
+          - generic [ref=f3e156]: Optional feature
+          - generic [ref=f3e157]: Required only when enabled
+      - article [ref=f3e158]:
+        - generic [ref=f3e159]:
+          - generic [ref=f3e160]:
+            - generic [ref=f3e161]:
+              - generic [ref=f3e162]:
+                - generic [ref=f3e163]:
+                  - paragraph [ref=f3e164]: Google Calendar
+                  - generic [ref=f3e165]: Optional
+                - heading "Save the latest focus session as an event" [level=2] [ref=f3e166]
+              - generic [ref=f3e167]: Checking
+            - status [ref=f3e168]: Checking whether Google Calendar credentials and Calendar ID are configured.
+            - generic [ref=f3e169]:
+              - generic [ref=f3e170]:
+                - generic [ref=f3e171]: Calendar ID from Google settings
+                - strong [ref=f3e172]: Checking
+              - generic [ref=f3e173]:
+                - generic [ref=f3e174]: Latest completed focus
+                - strong [ref=f3e175]: Checking
+            - generic [ref=f3e176]:
+              - button "Sync to Google Calendar" [disabled]
+              - paragraph [ref=f3e177]:
+                - strong [ref=f3e178]: "Button logic:"
+                - text: creates one event for the latest completed
+                - code [ref=f3e179]: work
+                - text: session. It does not export breaks, does not run automatically, and blocks a second event for the same session.
+            - paragraph [ref=f3e180]:
+              - strong [ref=f3e181]: "Where to check:"
+              - text: open the shared Google Calendar and find the “Pomodoro focus session” event at the completed session time.
+          - complementary "Google Calendar setup steps" [ref=f3e182]:
+            - generic [ref=f3e183]:
+              - generic [ref=f3e184]: Required for Calendar sync
+              - heading "Set up once, then use the button" [level=3] [ref=f3e185]
+            - list [ref=f3e186]:
+              - listitem [ref=f3e187]:
+                - text: In Google Calendar open
+                - strong [ref=f3e188]: Settings and sharing → Integrate calendar
+                - text: and copy
+                - strong [ref=f3e189]: Calendar ID
+                - text: (recommended). An official Google Calendar embed URL also works when it contains the
+                - code [ref=f3e190]: src
+                - text: parameter.
+              - listitem [ref=f3e191]:
+                - text: Put that value in
+                - code [ref=f3e192]: GOOGLE_CALENDAR_ID
+                - text: and one-line service-account JSON in
+                - code [ref=f3e193]: GOOGLE_CALENDAR_CREDENTIALS_JSON
+                - text: inside server
+                - code [ref=f3e194]: .env
+                - text: .
+              - listitem [ref=f3e195]:
+                - text: Share the calendar with the service account’s
+                - code [ref=f3e196]: client_email
+                - text: and allow it to make changes to events.
+              - listitem [ref=f3e197]:
+                - text: Restart Flask, complete one focus interval, then click
+                - strong [ref=f3e198]: Sync to Google Calendar
+                - text: .
+            - paragraph [ref=f3e199]:
+              - generic [ref=f3e200]: Optional
+              - code [ref=f3e201]: GOOGLE_CALENDAR_EVENT_PREFIX
+              - text: and event color only customize the event.
+      - article [ref=f3e202]:
+        - generic [ref=f3e203]:
+          - generic [ref=f3e204]:
+            - generic [ref=f3e205]:
+              - generic [ref=f3e206]:
+                - generic [ref=f3e207]:
+                  - paragraph [ref=f3e208]: Google Sheets
+                  - generic [ref=f3e209]: Optional
+                - heading "Export completed focus sessions as rows" [level=2] [ref=f3e210]
+              - generic [ref=f3e211]: Checking
+            - generic [ref=f3e213]:
+              - heading [level=3] [ref=f3e214]:
+                - button "Google Sheets Settings" [expanded] [ref=f3e215] [cursor=pointer]
+              - generic "Google Sheets Settings" [ref=f3e216]:
+                - generic [ref=f3e217]:
+                  - generic [ref=f3e218]:
+                    - generic [ref=f3e219]:
+                      - checkbox "Enable Google Sheets export Optional switch" [ref=f3e220]
+                      - text: Enable Google Sheets export
+                      - generic [ref=f3e221]: Optional switch
+                    - generic [ref=f3e222]:
+                      - generic [ref=f3e223]:
+                        - text: Spreadsheet ID
+                        - generic [ref=f3e224]: Required when enabled
+                      - textbox "Spreadsheet ID Required when enabled" [ref=f3e225]
+                      - generic [ref=f3e226]:
+                        - text: Copy only the value between
+                        - code [ref=f3e227]: /d/
+                        - text: and
+                        - code [ref=f3e228]: /edit
+                        - text: in the Google Sheets URL, not the whole URL.
+                  - generic [ref=f3e229]:
+                    - generic [ref=f3e230]: Service-account credentials on Flask server
+                    - strong [ref=f3e231]: Checking
+                  - generic [ref=f3e232]:
+                    - button "Save Settings" [ref=f3e233] [cursor=pointer]
+                    - button "Sync Completed Sessions" [disabled]
+                  - generic [ref=f3e234]:
+                    - paragraph [ref=f3e235]:
+                      - strong [ref=f3e236]: "Save Settings:"
+                      - text: validates the enabled setup and stores only the switch and Spreadsheet ID in SQLite. It sends no rows to Google.
+                    - paragraph [ref=f3e237]:
+                      - strong [ref=f3e238]: "Sync Completed Sessions:"
+                      - text: reads completed
+                      - code [ref=f3e239]: work
+                      - text: records, creates the A:I header if needed, and appends only Session IDs that are not already present.
+                  - status [ref=f3e240]: Loading Google Sheets settings.
+          - complementary "Google Sheets setup steps" [ref=f3e241]:
+            - generic [ref=f3e242]:
+              - generic [ref=f3e243]: Required only after enabling
+              - heading "From Google Cloud to the spreadsheet" [level=3] [ref=f3e244]
+            - list [ref=f3e245]:
+              - listitem [ref=f3e246]:
+                - text: Enable
+                - strong [ref=f3e247]: Google Sheets API
+                - text: and create a service account in Google Cloud.
+              - listitem [ref=f3e248]: Create its JSON key and keep that file outside the repository.
+              - listitem [ref=f3e249]:
+                - text: Share the target spreadsheet with the JSON
+                - code [ref=f3e250]: client_email
+                - text: as
+                - strong [ref=f3e251]: Editor
+                - text: .
+              - listitem [ref=f3e252]:
+                - text: Put compressed one-line JSON in
+                - code [ref=f3e253]: GOOGLE_SHEETS_CREDENTIALS_JSON
+                - text: ", set"
+                - code [ref=f3e254]: GOOGLE_SHEETS_ENABLED=true
+                - text: ", and restart Flask."
+              - listitem [ref=f3e255]:
+                - text: Enter the Spreadsheet ID here, click
+                - strong [ref=f3e256]: Save Settings
+                - text: ", then"
+                - strong [ref=f3e257]: Sync Completed Sessions
+                - text: .
+            - paragraph [ref=f3e258]:
+              - strong [ref=f3e259]: "Where to check:"
+              - text: the first worksheet receives columns A:I. Run sync twice—the second run should report duplicates as skipped, without extra rows.
+            - paragraph [ref=f3e260]:
+              - generic [ref=f3e261]: Safe when off
+              - text: With Sheets disabled, credentials and Spreadsheet ID stay unvalidated and no Google client or network request is created.
+      - article [ref=f3e262]:
+        - generic [ref=f3e264]:
+          - paragraph [ref=f3e265]: How it works
+          - heading "Timer logic" [level=2] [ref=f3e266]
+        - list [ref=f3e267]:
+          - listitem [ref=f3e268]: "The active timer is stored in `localStorage`, so a page reload does not destroy the current session."
+          - listitem [ref=f3e269]: Completed work, short break, and long break sessions are saved through Flask API into the database.
+          - listitem [ref=f3e270]: Daily, weekly, and monthly hours are calculated from stored database sessions.
+          - listitem [ref=f3e271]: Settings control durations, auto-start for the next session, and the long-break interval.
+  - contentinfo [ref=f3e272]:
+    - paragraph [ref=f3e273]: Bootstrap 5.3, Flask, SQLite, Vanilla JS, Chart.js, optional Google Calendar sync.
+    - paragraph [ref=f3e274]: © 2026 Pomodoro Work Tracker
